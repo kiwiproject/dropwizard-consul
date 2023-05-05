@@ -63,14 +63,14 @@ class ConsulBundleTest {
 
   @Test
   public void testMissingServiceName() throws Exception {
-    factory.setSeviceName(null);
+    factory.setServiceName(null);
     bundle.run(config, environment);
     assertThat(factory.getServiceName()).isEqualTo("test");
   }
 
   @Test
   public void testPopulatedServiceName() throws Exception {
-    factory.setSeviceName("test-service-name");
+    factory.setServiceName("test-service-name");
     bundle.run(config, environment);
     assertThat(factory.getServiceName()).isEqualTo("test-service-name");
   }

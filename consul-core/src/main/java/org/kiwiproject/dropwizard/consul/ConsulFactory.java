@@ -93,10 +93,13 @@ public class ConsulFactory {
     this.serviceName = serviceName;
   }
 
+  /**
+   * @deprecated use {@link #setServiceName(String)}
+   */
   @Deprecated
   @JsonProperty
   public void setSeviceName(@Nullable String serviceName) {
-    this.serviceName = serviceName;
+    setServiceName(serviceName);
   }
 
   @JsonProperty

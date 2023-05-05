@@ -10,9 +10,9 @@ import static org.mockito.Mockito.when;
 
 import com.orbitz.consul.ConsulException;
 import io.dropwizard.util.Duration;
-import io.dropwizard.util.Sets;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -47,7 +47,7 @@ class ConsulServiceListenerTest {
         .thenThrow(new ConsulException("Cannot connect to Consul"))
         .thenReturn(true);
 
-    Collection<String> hosts = Sets.of("192.168.1.22");
+    Collection<String> hosts = Set.of("192.168.1.22");
     listener.register("http", 0, 0, hosts);
 
     verify(advertiser, timeout(100).atLeast(1)).register("http", 0, 0, hosts);

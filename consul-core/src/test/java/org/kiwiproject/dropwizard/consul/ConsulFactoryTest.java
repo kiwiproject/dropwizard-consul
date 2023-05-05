@@ -61,9 +61,18 @@ class ConsulFactoryTest {
     assertThat(consulFactory.getServiceName()).isEqualTo(serviceName);
   }
 
+  @SuppressWarnings("deprecation")
+  @Test
+  void shouldSetServiceName_WhenUsingDeprecated_SetSeviceName() {
+    var consulFactory = new ConsulFactory();
+    var serviceName = "test-service";
+    consulFactory.setSeviceName(serviceName);
+    assertThat(consulFactory.getServiceName()).isEqualTo(serviceName);
+  }
+
   private ConsulFactory createFullyPopulatedConsulFactory() {
     final ConsulFactory consulFactory = new ConsulFactory();
-    consulFactory.setSeviceName("serviceName");
+    consulFactory.setServiceName("serviceName");
     consulFactory.setEnabled(true);
     consulFactory.setServicePort(1000);
     consulFactory.setAdminPort(2000);
