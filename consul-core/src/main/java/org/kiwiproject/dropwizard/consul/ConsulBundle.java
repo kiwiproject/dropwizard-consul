@@ -51,6 +51,7 @@ public abstract class ConsulBundle<C extends Configuration>
    *
    * @param name Service Name
    */
+  @SuppressWarnings("java:S5993")
   public ConsulBundle(final String name) {
     this(name, false);
   }
@@ -59,6 +60,7 @@ public abstract class ConsulBundle<C extends Configuration>
    * @param name Service Name
    * @param strict If true, the application fails fast if a key cannot be found in Consul KV
    */
+  @SuppressWarnings("java:S5993")
   public ConsulBundle(final String name, final boolean strict) {
     this(name, strict, false);
   }
@@ -68,6 +70,7 @@ public abstract class ConsulBundle<C extends Configuration>
    * @param strict If true, the application fails fast if a key cannot be found in Consul KV
    * @param substitutionInVariables If true, substitution will be done within variable names.
    */
+  @SuppressWarnings("java:S5993")
   public ConsulBundle(
       final String name, final boolean strict, final boolean substitutionInVariables) {
     this.defaultServiceName = Objects.requireNonNull(name);

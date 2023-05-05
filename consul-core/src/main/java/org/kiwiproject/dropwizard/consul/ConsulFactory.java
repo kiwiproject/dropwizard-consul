@@ -233,15 +233,13 @@ public class ConsulFactory {
 
     final Consul.Builder builder = Consul.builder().withHostAndPort(endpoint).withPing(servicePing);
 
-    aclToken.ifPresent(
-        token -> {
-          // setting both acl token here and with header, supplying an auth
-          // header. This should cover both use cases: endpoint supports
-          // legacy ?token query param and other case in which endpoint
-          // requires an X-Consul-Token header.
-          // @see https://www.consul.io/api/index.html#acls
-          builder.withAclToken(token).withHeaders(ImmutableMap.of(CONSUL_AUTH_HEADER_KEY, token));
-        });
+    // setting both acl token here and with header, supplying an auth
+    // header. This should cover both use cases: endpoint supports
+    // legacy ?token query param and other case in which endpoint
+    // requires an X-Consul-Token header.
+    // @see https://www.consul.io/api/index.html#acls
+    aclToken.ifPresent(token ->
+            builder.withAclToken(token).withHeaders(ImmutableMap.of(CONSUL_AUTH_HEADER_KEY, token)));
 
     return builder.build();
   }

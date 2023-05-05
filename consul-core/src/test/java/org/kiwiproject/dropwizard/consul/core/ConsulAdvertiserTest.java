@@ -41,7 +41,7 @@ class ConsulAdvertiserTest {
   private final AgentClient agent = mock(AgentClient.class);
   private final Environment environment = mock(Environment.class);
   private final MutableServletContextHandler handler = mock(MutableServletContextHandler.class);
-  private final Supplier<String> supplierMock = mock(Supplier.class);
+  @SuppressWarnings("unchecked") private final Supplier<String> supplierMock = mock(Supplier.class);
   private final String serviceId = "test";
   private ConsulAdvertiser advertiser;
   private ConsulFactory factory;

@@ -80,6 +80,6 @@ class ConsulBundleTest {
     String token = "acl-token";
     factory.setAclToken(token);
     bundle.run(config, environment);
-    assertThat(factory.getAclToken().get()).isEqualTo(token);
+    assertThat(factory.getAclToken()).contains(token);
   }
 }
