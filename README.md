@@ -51,7 +51,7 @@ Dependency Info
 
 Usage
 -----
-Add a `ConsulBundle` to your [Application](https://javadoc.io/doc/io.dropwizard/dropwizard-project/latest/io/dropwizard/Application.html) class.
+Add a `ConsulBundle` to your [Application](https://javadoc.io/doc/io.dropwizard/dropwizard-project/latest/io/dropwizard/core/Application.html) class.
 
 ```java
 @Override
@@ -92,7 +92,7 @@ consul:
 
 Example Application
 -------------------
-This bundle includes a modified version of the `HelloWorldApplication` from Dropwizard's [Getting Started](https://www.dropwizard.io/1.3.12/docs/getting-started.html) documentation.
+This bundle includes a modified version of the `HelloWorldApplication` from Dropwizard's [Getting Started](https://www.dropwizard.io/en/latest/getting-started.html) documentation.
 
 You can execute this application by first starting Consul on your local machine then running:
 
@@ -103,7 +103,7 @@ java -jar consul-example/target/consul-example-2.0.7-4-SNAPSHOT.jar server consu
 
 This will start the application on port `8080` (admin port `8180`). This application demonstrations the following Consul integration points:
 
-- The application is registered as a service with Consul (with the [service port](https://www.consul.io/docs/agent/services.html) set to the applicationConnectors port in the configuration file.
+- The application is registered as a service with Consul (with the [service port](https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference#port) set to the applicationConnectors port in the configuration file.
 - The application will lookup any variables in the configuration file from Consul upon startup (it defaults to connecting to a Consul agent running on `localhost:8500` for this functionality)
 - The application exposes an additional HTTP endpoint for querying Consul for available healthy services:
 ```
