@@ -2,10 +2,12 @@ package com.example.helloworld;
 
 import com.example.helloworld.resources.HelloWorldResource;
 import com.orbitz.consul.Consul;
-import com.smoketurner.dropwizard.consul.ConsulBundle;
-import com.smoketurner.dropwizard.consul.ConsulFactory;
-import com.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClient;
-import com.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClientBuilder;
+
+import org.kiwiproject.dropwizard.consul.ConsulBundle;
+import org.kiwiproject.dropwizard.consul.ConsulFactory;
+import org.kiwiproject.dropwizard.consul.ribbon.RibbonJerseyClient;
+import org.kiwiproject.dropwizard.consul.ribbon.RibbonJerseyClientBuilder;
+
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;

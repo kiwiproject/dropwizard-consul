@@ -29,7 +29,7 @@ server:
 logging:
   level: INFO
   loggers:
-    com.smoketurner.dropwizard.consul: DEBUG
+    org.kiwiproject.dropwizard.consul: DEBUG
     com.example.helloworld: DEBUG
     com.netflix.loadbalancer: DEBUG
   appenders:
