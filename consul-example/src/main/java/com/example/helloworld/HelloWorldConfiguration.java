@@ -3,7 +3,7 @@ package com.example.helloworld;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.kiwiproject.dropwizard.consul.ConsulFactory;
-import org.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClientConfiguration;
+import org.kiwiproject.dropwizard.consul.ribbon.RibbonJerseyClientConfiguration;
 
 import io.dropwizard.Configuration;
 import javax.validation.Valid;

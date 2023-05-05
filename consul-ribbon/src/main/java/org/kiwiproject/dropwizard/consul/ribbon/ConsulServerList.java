@@ -1,4 +1,4 @@
-package org.smoketurner.dropwizard.consul.ribbon;
+package org.kiwiproject.dropwizard.consul.ribbon;
 
 import com.google.common.base.Strings;
 import com.netflix.loadbalancer.Server;

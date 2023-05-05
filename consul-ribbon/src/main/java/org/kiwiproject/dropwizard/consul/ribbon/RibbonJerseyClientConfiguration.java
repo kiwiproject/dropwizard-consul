@@ -1,4 +1,4 @@
-package org.smoketurner.dropwizard.consul.ribbon;
+package org.kiwiproject.dropwizard.consul.ribbon;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;

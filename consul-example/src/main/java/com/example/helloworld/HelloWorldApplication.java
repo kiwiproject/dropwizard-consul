@@ -5,8 +5,8 @@ import com.orbitz.consul.Consul;
 
 import org.kiwiproject.dropwizard.consul.ConsulBundle;
 import org.kiwiproject.dropwizard.consul.ConsulFactory;
-import org.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClient;
-import org.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClientBuilder;
+import org.kiwiproject.dropwizard.consul.ribbon.RibbonJerseyClient;
+import org.kiwiproject.dropwizard.consul.ribbon.RibbonJerseyClientBuilder;
 
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;

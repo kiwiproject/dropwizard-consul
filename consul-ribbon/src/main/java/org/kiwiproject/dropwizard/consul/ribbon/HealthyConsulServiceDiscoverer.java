@@ -1,4 +1,4 @@
-package org.smoketurner.dropwizard.consul.ribbon;
+package org.kiwiproject.dropwizard.consul.ribbon;
 
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.health.ServiceHealth;

@@ -1,4 +1,4 @@
-package org.smoketurner.dropwizard.consul.ribbon;
+package org.kiwiproject.dropwizard.consul.ribbon;
 
 import com.google.common.primitives.Ints;
 import com.netflix.client.config.CommonClientConfigKey;
