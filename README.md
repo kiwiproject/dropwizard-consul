@@ -1,9 +1,10 @@
 Dropwizard Consul Bundle
 ========================
-[![Build Status](https://travis-ci.org/smoketurner/dropwizard-consul.svg?branch=master)](https://travis-ci.org/smoketurner/dropwizard-consul)
-[![Maven Central](https://img.shields.io/maven-central/v/com.smoketurner.dropwizard/dropwizard-consul.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.smoketurner.dropwizard/dropwizard-consul/)
-[![GitHub license](https://img.shields.io/github/license/smoketurner/dropwizard-consul.svg?style=flat-square)](https://github.com/smoketurner/dropwizard-consul/tree/master)
-[![Become a Patron](https://img.shields.io/badge/Patron-Patreon-red.svg)](https://www.patreon.com/bePatron?u=9567343)
+
+_This README is a work in progress as we transition dropwizard-consul from smoketurner to kiwiproject._
+
+Introduction
+------------
 
 A bundle for using [Consul](https://consul.io) in Dropwizard applications. Features:
 
@@ -12,6 +13,26 @@ A bundle for using [Consul](https://consul.io) in Dropwizard applications. Featu
 * The Dropwizard service is registered as a Consul service with a Consul-side health check querying the Dropwizard [health check](https://www.dropwizard.io/en/latest/manual/core.html#health-checks)
 * Ability to resolve [configuration](https://www.dropwizard.io/en/latest/manual/core.html#configuration) properties from Consul's KV store
 * Admin task to toggle Consul's [maintenance](https://www.consul.io/api/agent.html#enable-maintenance-mode) mode
+
+Background
+----------
+
+This library was imported from [smoketurner/dropwizard-consul](https://github.com/smoketurner/dropwizard-consul), which
+is now a [public archive](https://docs.github.com/en/repositories/archiving-a-github-repository/archiving-repositories)
+and is no longer maintained by the original author.
+
+Since we are still using this library in our services which use Dropwizard and Consul, we decided to import the original
+repository and continue maintaining it for our own use, and anyone else who might want to use it.  We make no guarantees
+whatsoever about how long we will maintain it, and also plan to make our own changes such as changing the base package
+name to `org.kiwiproject` to be consistent with our other libraries.
+
+All other [kiwiproject](https://github.com/kiwiproject/) projects are MIT-licensed. However, because the original
+dropwizard-consul uses the Apache 2.0 license, we are keeping the Apache 2.0 license (otherwise to switch to MIT we would
+have to gain consent of all contributors, which we do not want to do).
+
+Another thing to note is that we _imported_ this repository from the original, so that it is a "disconnected fork". We
+did not want a reference to the original repository since it is a public archive and no longer maintained. Thus, while
+we maintain the history that this is a fork , it is completely disconnected and is now a standalone (normal) repository.
 
 Dependency Info
 ---------------
@@ -154,15 +175,19 @@ Content-Length: 870
 
 Credits
 -------
-This bundle was inspired by an older bundle (Dropwizard 0.6.2) that [Chris Gray](https://github.com/chrisgray) created at https://github.com/chrisgray/dropwizard-consul. I also incorporated the configuration provider changes from https://github.com/remmelt/dropwizard-consul-config-provider
+This library comes from the [dropwizard-consul](https://github.com/smoketurner/dropwizard-consul) library from
+[Smoketurner](https://github.com/smoketurner/). The following credits are also retained from the original library.
+
+> This bundle was inspired by an older bundle (Dropwizard 0.6.2) that [Chris Gray](https://github.com/chrisgray) created at https://github.com/chrisgray/dropwizard-consul. I also incorporated the configuration provider changes from https://github.com/remmelt/dropwizard-consul-config-provider
 
 Support
 -------
-Please file bug reports and feature requests in [GitHub issues](https://github.com/smoketurner/dropwizard-consul/issues).
+Please file bug reports and feature requests in [GitHub issues](https://github.com/kiwiproject/dropwizard-consul/issues).
 
 License
 -------
 Copyright (c) 2020 Smoke Turner, LLC
+Copyright (c) 2023 Kiwi Project
 
 This library is licensed under the Apache License, Version 2.0.
 
