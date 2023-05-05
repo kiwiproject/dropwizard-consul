@@ -13,9 +13,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.net.util.SubnetUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConsulFactory {
   private static final String CONSUL_AUTH_HEADER_KEY = "X-Consul-Token";

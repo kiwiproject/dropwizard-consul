@@ -27,5 +27,9 @@
             <artifactId>commons-net</artifactId>
             <version>3.9.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+        </dependency>
     </dependencies>
 </project>
