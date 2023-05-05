@@ -54,7 +54,7 @@ class ConsulAdvertiserTest {
     when(handler.getContextPath()).thenReturn("admin");
     when(supplierMock.get()).thenReturn(null);
     factory = new ConsulFactory();
-    factory.setSeviceName("test");
+    factory.setServiceName("test");
     factory.setServiceSubnet("192.168.2.0/24");
     factory.setServiceAddressSupplier(supplierMock);
     factory.setHealthCheckPath(DEFAULT_HEALTH_CHECK_PATH);

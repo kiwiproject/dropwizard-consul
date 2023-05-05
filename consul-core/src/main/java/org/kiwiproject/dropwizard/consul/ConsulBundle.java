@@ -130,7 +130,7 @@ public abstract class ConsulBundle<C extends Configuration>
 
   protected void runEnabled(ConsulFactory consulConfig, Environment environment) {
     if (Strings.isNullOrEmpty(consulConfig.getServiceName())) {
-      consulConfig.setSeviceName(defaultServiceName);
+      consulConfig.setServiceName(defaultServiceName);
     }
     setupEnvironment(consulConfig, environment);
   }
