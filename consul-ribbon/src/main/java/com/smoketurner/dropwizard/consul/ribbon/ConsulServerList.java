@@ -5,11 +5,13 @@ import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.health.ServiceHealth;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 public class ConsulServerList implements ServerList<Server> {
 

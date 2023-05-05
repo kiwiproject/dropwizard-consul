@@ -4,8 +4,8 @@ import com.orbitz.consul.Consul;
 import io.dropwizard.configuration.UndefinedEnvironmentVariableException;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.apache.commons.text.lookup.StringLookup;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
