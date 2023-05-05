@@ -1,11 +1,23 @@
-.classpath
-.project
-.settings
+### Maven template
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+!/.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ project files
 .idea
 *.iml
-.DS_Store
-*.class
-*.jar
-hs_err_pid*
-target
-dependency-reduced-pom.xml
+
+# Deployment log
+maven-central-deploy.log
+
+# VS Code configuration files
+.vscode
