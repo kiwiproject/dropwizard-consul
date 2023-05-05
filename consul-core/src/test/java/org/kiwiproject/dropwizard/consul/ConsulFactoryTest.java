@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.util.Duration;
-import org.junit.Test;
-import org.kiwiproject.dropwizard.consul.ConsulFactory;
 
-public class ConsulFactoryTest {
+import org.junit.jupiter.api.Test;
+
+class ConsulFactoryTest {
 
   @Test
   public void testEquality() {

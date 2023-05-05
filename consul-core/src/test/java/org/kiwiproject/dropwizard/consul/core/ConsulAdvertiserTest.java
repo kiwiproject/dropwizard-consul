@@ -26,12 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import org.junit.Before;
-import org.junit.Test;
-import org.kiwiproject.dropwizard.consul.ConsulFactory;
-import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
-public class ConsulAdvertiserTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.kiwiproject.dropwizard.consul.ConsulFactory;
+
+class ConsulAdvertiserTest {
 
   public static final String SECOND_SUBNET_IP = "192.168.2.99";
   public static final String FIRST_SUBNET_IP = "192.168.1.53";
@@ -47,7 +47,7 @@ public class ConsulAdvertiserTest {
   private ConsulFactory factory;
   private String healthCheckUrl;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     when(consul.agentClient()).thenReturn(agent);
     when(environment.getAdminContext()).thenReturn(handler);
