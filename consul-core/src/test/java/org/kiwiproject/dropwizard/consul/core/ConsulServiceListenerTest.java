@@ -15,23 +15,22 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
-import org.kiwiproject.dropwizard.consul.core.ConsulServiceListener;
 
-public class ConsulServiceListenerTest {
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class ConsulServiceListenerTest {
 
   private final ConsulAdvertiser advertiser = mock(ConsulAdvertiser.class);
   private ScheduledExecutorService scheduler;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     scheduler = Executors.newScheduledThreadPool(1);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     if (scheduler != null) {
       scheduler.shutdownNow();

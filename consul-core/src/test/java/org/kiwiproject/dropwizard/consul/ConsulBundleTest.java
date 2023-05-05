@@ -8,15 +8,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Environment;
-import org.junit.Before;
-import org.junit.Test;
-import org.kiwiproject.dropwizard.consul.ConsulBundle;
-import org.kiwiproject.dropwizard.consul.ConsulConfiguration;
-import org.kiwiproject.dropwizard.consul.ConsulFactory;
 
-public class ConsulBundleTest {
+class ConsulBundleTest {
 
   private final ConsulFactory factory = spy(new ConsulFactory());
   private final Environment environment = mock(Environment.class);
@@ -30,7 +28,7 @@ public class ConsulBundleTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     bundle =
         spy(

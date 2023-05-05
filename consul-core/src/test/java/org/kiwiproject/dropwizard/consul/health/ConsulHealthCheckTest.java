@@ -10,17 +10,17 @@ import com.codahale.metrics.health.HealthCheck.Result;
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
-import org.junit.Before;
-import org.junit.Test;
-import org.kiwiproject.dropwizard.consul.health.ConsulHealthCheck;
 
-public class ConsulHealthCheckTest {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class ConsulHealthCheckTest {
 
   private final Consul consul = mock(Consul.class);
   private final AgentClient agent = mock(AgentClient.class);
   private final ConsulHealthCheck healthCheck = new ConsulHealthCheck(consul);
 
-  @Before
+  @BeforeEach
   public void setUp() {
     when(consul.agentClient()).thenReturn(agent);
   }
