@@ -1,18 +1,3 @@
-/*
- * Copyright © 2019 Smoke Turner, LLC (github@smoketurner.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.smoketurner.dropwizard.consul.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,8 +88,8 @@ public class ConsulAdvertiserTest {
   }
 
   /**
-   * Added to verify that NullPointerException is not thrown when a healthCheckPath
-   * is not specified on ConsulFactory.
+   * Added to verify that NullPointerException is not thrown when a healthCheckPath is not specified
+   * on ConsulFactory.
    */
   @Test
   public void testRegisterWhenHealthCheckPathNotSpecifiedOnFactory() {
@@ -140,8 +125,9 @@ public class ConsulAdvertiserTest {
     advertiser.register(
         "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, SECOND_SUBNET_IP, THIRD_SUBNET_IP));
 
-      String healthCheckUrlWithCorrectSubnet = "http://192.168.2.99:8081/admin/" + DEFAULT_HEALTH_CHECK_PATH;
-      final ImmutableRegistration registration =
+    String healthCheckUrlWithCorrectSubnet =
+        "http://192.168.2.99:8081/admin/" + DEFAULT_HEALTH_CHECK_PATH;
+    final ImmutableRegistration registration =
         ImmutableRegistration.builder()
             .port(8080)
             .check(
@@ -189,8 +175,8 @@ public class ConsulAdvertiserTest {
     advertiser.register(
         "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
-      String healthCheckUrlWithCorrectSubnet = "http://192.168.8.99:8081/admin/healthcheck";
-      final ImmutableRegistration registration =
+    String healthCheckUrlWithCorrectSubnet = "http://192.168.8.99:8081/admin/healthcheck";
+    final ImmutableRegistration registration =
         ImmutableRegistration.builder()
             .port(8080)
             .check(
@@ -301,7 +287,7 @@ public class ConsulAdvertiserTest {
         new ConsulAdvertiser(environment, factory, consul, serviceId);
     advertiser.register("http", 8080, 8081);
 
-      final ImmutableRegistration registration =
+    final ImmutableRegistration registration =
         ImmutableRegistration.builder()
             .tags(tags)
             .check(
@@ -377,35 +363,35 @@ public class ConsulAdvertiserTest {
     verify(agent).register(registration);
   }
 
-    @Test
-    public void testHealthCheckUrlFromConfig() {
-        factory.setServicePort(8888);
-        factory.setServiceAddress("127.0.0.1");
-        factory.setHealthCheckPath("ping");
-        String configuredHealthCheckUrl = "http://127.0.0.1:8081/admin/ping";
+  @Test
+  public void testHealthCheckUrlFromConfig() {
+    factory.setServicePort(8888);
+    factory.setServiceAddress("127.0.0.1");
+    factory.setHealthCheckPath("ping");
+    String configuredHealthCheckUrl = "http://127.0.0.1:8081/admin/ping";
 
-        when(agent.isRegistered(anyString())).thenReturn(false);
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, factory, consul, serviceId);
-        advertiser.register("http", 8080, 8081);
+    when(agent.isRegistered(anyString())).thenReturn(false);
+    final ConsulAdvertiser advertiser =
+        new ConsulAdvertiser(environment, factory, consul, serviceId);
+    advertiser.register("http", 8080, 8081);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .id(serviceId)
-                .port(8888)
-                .address("127.0.0.1")
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(configuredHealthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
-                .build();
+    final ImmutableRegistration registration =
+        ImmutableRegistration.builder()
+            .id(serviceId)
+            .port(8888)
+            .address("127.0.0.1")
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(configuredHealthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(ImmutableMap.of("scheme", "http"))
+            .build();
 
-        verify(agent).register(registration);
-    }
+    verify(agent).register(registration);
+  }
 
   @Test
   public void testDeregister() {
