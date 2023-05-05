@@ -38,14 +38,14 @@ Dependency Info
 ---------------
 ```xml
 <dependency>
-    <groupId>com.smoketurner.dropwizard</groupId>
+    <groupId>org.kiwiproject</groupId>
     <artifactId>consul-core</artifactId>
-    <version>2.0.7-1</version>
+    <version>[current-version]</version>
 </dependency>
 <dependency>
-    <groupId>com.smoketurner.dropwizard</groupId>
+    <groupId>org.kiwiproject</groupId>
     <artifactId>consul-ribbon</artifactId>
-    <version>2.0.7-1</version>
+    <version>[current-version]</version>
 </dependency>
 ```
 

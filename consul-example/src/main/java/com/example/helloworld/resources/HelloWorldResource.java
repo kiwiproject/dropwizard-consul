@@ -6,7 +6,9 @@ import com.google.common.base.Optional;
 import com.netflix.loadbalancer.Server;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.health.ServiceHealth;
-import com.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClient;
+
+import org.smoketurner.dropwizard.consul.ribbon.RibbonJerseyClient;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.GET;
