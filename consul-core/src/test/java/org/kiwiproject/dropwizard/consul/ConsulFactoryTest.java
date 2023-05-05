@@ -42,7 +42,7 @@ class ConsulFactoryTest {
   public void testHashCode() {
     final ConsulFactory actual = createFullyPopulatedConsulFactory();
     final ConsulFactory expected = createFullyPopulatedConsulFactory();
-    assertThat(actual.hashCode()).isEqualTo(expected.hashCode());
+    assertThat(actual.hashCode()).hasSameHashCodeAs(expected);
   }
 
   @Test

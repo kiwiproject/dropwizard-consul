@@ -106,18 +106,14 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     } catch (ConsulException e) {
       LOGGER.error("Failed to register service in Consul", e);
 
-      retryInterval.ifPresent(
-          (interval) -> {
-            scheduler.ifPresent(
-                (service) -> {
-                  LOGGER.info(
-                      "Will try to register service again in {} seconds", interval.toSeconds());
-                  service.schedule(
-                      () -> register(applicationScheme, applicationPort, adminPort, hosts),
-                      interval.toSeconds(),
-                      TimeUnit.SECONDS);
-                });
-          });
+      retryInterval.ifPresent(interval ->
+              scheduler.ifPresent(service -> {
+                      LOGGER.info("Will try to register service again in {} seconds", interval.toSeconds());
+                      service.schedule(
+                          () -> register(applicationScheme, applicationPort, adminPort, hosts),
+                          interval.toSeconds(),
+                          TimeUnit.SECONDS);
+              }));
     }
   }
 }
