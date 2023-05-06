@@ -62,12 +62,12 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testGetServiceId() {
+    void testGetServiceId() {
         assertThat(advertiser.getServiceId()).isEqualTo(serviceId);
     }
 
     @Test
-    public void testRegister() {
+    void testRegister() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.register("http", 8080, 8081);
 
@@ -93,7 +93,7 @@ class ConsulAdvertiserTest {
      * on ConsulFactory.
      */
     @Test
-    public void testRegisterWhenHealthCheckPathNotSpecifiedOnFactory() {
+    void testRegisterWhenHealthCheckPathNotSpecifiedOnFactory() {
         factory = new ConsulFactory();
         factory.setServiceName("test");
         factory.setServiceSubnet("192.168.2.0/24");
@@ -121,7 +121,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testRegisterWithSubnet() {
+    void testRegisterWithSubnet() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.register(
             "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, SECOND_SUBNET_IP, THIRD_SUBNET_IP));
@@ -147,7 +147,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testRegisterWithSubnetNoEligibleIps() {
+    void testRegisterWithSubnetNoEligibleIps() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.register(
             "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
@@ -170,7 +170,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testRegisterWithSupplier() {
+    void testRegisterWithSupplier() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         when(supplierMock.get()).thenReturn("192.168.8.99");
         advertiser.register(
@@ -196,7 +196,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testRegisterWithSupplierException() {
+    void testRegisterWithSupplierException() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         when(supplierMock.get()).thenThrow(new IllegalArgumentException());
         advertiser.register(
@@ -220,7 +220,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testRegisterWithHttps() {
+    void testRegisterWithHttps() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.register("https", 8080, 8081);
 
@@ -243,7 +243,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testRegisterAlreadyRegistered() {
+    void testRegisterAlreadyRegistered() {
         when(agent.isRegistered(anyString())).thenReturn(true);
         advertiser.register("http", 8080, 8081);
         verify(agent, never())
@@ -251,7 +251,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testHostFromConfig() {
+    void testHostFromConfig() {
         factory.setServicePort(8888);
         factory.setServiceAddress("127.0.0.1");
 
@@ -279,7 +279,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testTagsFromConfig() {
+    void testTagsFromConfig() {
         final List<String> tags = Arrays.asList("test", "second-test");
         factory.setTags(tags);
 
@@ -307,7 +307,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testAclTokenFromConfig() {
+    void testAclTokenFromConfig() {
         String aclToken = "acl-token";
         factory.setAclToken(aclToken);
 
@@ -335,7 +335,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testServiceMetaFromConfig() {
+    void testServiceMetaFromConfig() {
         final Map<String, String> serviceMeta = new HashMap<>();
         serviceMeta.put("meta1-key", "meta1-value");
         serviceMeta.put("meta2-key", "meta2-value");
@@ -365,7 +365,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testHealthCheckUrlFromConfig() {
+    void testHealthCheckUrlFromConfig() {
         factory.setServicePort(8888);
         factory.setServiceAddress("127.0.0.1");
         factory.setHealthCheckPath("ping");
@@ -395,7 +395,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testDeregister() {
+    void testDeregister() {
         final String serviceId = advertiser.getServiceId();
         when(agent.isRegistered(serviceId)).thenReturn(true);
         advertiser.deregister();
@@ -403,7 +403,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testDeregisterNotRegistered() {
+    void testDeregisterNotRegistered() {
         final String serviceId = advertiser.getServiceId();
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.deregister();
@@ -411,7 +411,7 @@ class ConsulAdvertiserTest {
     }
 
     @Test
-    public void testDeregisterException() {
+    void testDeregisterException() {
         when(agent.isRegistered(anyString())).thenReturn(true);
         doThrow(new ConsulException("error")).when(agent).deregister(anyString());
         advertiser.deregister();

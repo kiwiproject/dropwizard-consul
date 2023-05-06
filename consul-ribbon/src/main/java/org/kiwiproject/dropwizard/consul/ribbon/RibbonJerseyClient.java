@@ -41,9 +41,9 @@ public class RibbonJerseyClient implements Client, Closeable {
      * @param delegate     Jersey Client delegate
      * @deprecated Use non-scheme constructor instead
      */
-    @Deprecated
+    @Deprecated(since = "0.5.0", forRemoval = true)
     public RibbonJerseyClient(
-        final String scheme,
+        @SuppressWarnings("unused") final String scheme,
         final ZoneAwareLoadBalancer<Server> loadBalancer,
         final Client delegate) {
         this.loadBalancer = Objects.requireNonNull(loadBalancer);

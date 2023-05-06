@@ -17,7 +17,7 @@ class ConsulAdvertiserManagerTest {
         new ConsulAdvertiserManager(advertiser, Optional.of(scheduler));
 
     @Test
-    public void testStop() throws Exception {
+    void testStop() throws Exception {
         manager.stop();
         verify(advertiser).deregister();
         verify(scheduler).shutdownNow();

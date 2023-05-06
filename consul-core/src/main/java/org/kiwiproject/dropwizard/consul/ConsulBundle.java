@@ -2,7 +2,6 @@ package org.kiwiproject.dropwizard.consul;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
@@ -21,6 +20,7 @@ import org.kiwiproject.dropwizard.consul.task.MaintenanceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -102,7 +102,7 @@ public abstract class ConsulBundle<C extends Configuration>
 
                         builder
                             .withAclToken(token)
-                            .withHeaders(ImmutableMap.of(CONSUL_AUTH_HEADER_KEY, token));
+                            .withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token));
                     });
 
             // using Consul as a configuration substitution provider

@@ -2,7 +2,6 @@ package com.example.helloworld.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.api.Saying;
-import com.google.common.base.Optional;
 import com.netflix.loadbalancer.Server;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.health.ServiceHealth;
@@ -15,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/")
@@ -39,7 +39,7 @@ public class HelloWorldResource {
     @Timed
     @Path("/hello-world")
     public Saying sayHello(@QueryParam("name") Optional<String> name) {
-        final String value = String.format(template, name.or(defaultName));
+        final String value = String.format(template, name.orElse(defaultName));
         return new Saying(counter.incrementAndGet(), value);
     }
 
