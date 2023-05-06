@@ -25,12 +25,12 @@ public class ConsulAdvertiserManager implements Managed {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         // the advertiser is register as a Jetty startup listener
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         advertiser.deregister();
         scheduler.ifPresent(ScheduledExecutorService::shutdownNow);
     }

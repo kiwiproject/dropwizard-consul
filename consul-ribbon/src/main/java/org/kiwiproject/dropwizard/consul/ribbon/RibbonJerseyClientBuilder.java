@@ -112,12 +112,12 @@ public class RibbonJerseyClientBuilder {
             .manage(
                 new Managed() {
                     @Override
-                    public void start() throws Exception {
+                    public void start() {
                         // nothing to start
                     }
 
                     @Override
-                    public void stop() throws Exception {
+                    public void stop() {
                         client.close();
                     }
                 });

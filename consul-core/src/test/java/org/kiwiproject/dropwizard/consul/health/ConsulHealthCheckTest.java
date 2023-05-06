@@ -25,14 +25,14 @@ class ConsulHealthCheckTest {
     }
 
     @Test
-    void testCheckHealthy() throws Exception {
+    void testCheckHealthy() {
         final Result actual = healthCheck.check();
         verify(agent).ping();
         assertThat(actual.isHealthy()).isTrue();
     }
 
     @Test
-    void testCheckUnhealthy() throws Exception {
+    void testCheckUnhealthy() {
         doThrow(new ConsulException("error")).when(agent).ping();
         final Result actual = healthCheck.check();
         verify(agent).ping();

@@ -69,7 +69,7 @@ class ConsulAdvertiserTest {
     @Test
     void testRegister() {
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -101,7 +101,7 @@ class ConsulAdvertiserTest {
         advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -245,7 +245,9 @@ class ConsulAdvertiserTest {
     @Test
     void testRegisterAlreadyRegistered() {
         when(agent.isRegistered(anyString())).thenReturn(true);
-        advertiser.register("http", 8080, 8081);
+        var didRegister = register(advertiser);
+        assertThat(didRegister).isFalse();
+
         verify(agent, never())
             .register(anyInt(), anyString(), anyLong(), anyString(), anyString(), anyList(), anyMap());
     }
@@ -258,7 +260,7 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(anyString())).thenReturn(false);
         final ConsulAdvertiser advertiser =
             new ConsulAdvertiser(environment, factory, consul, serviceId);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -286,7 +288,7 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         final ConsulAdvertiser advertiser =
             new ConsulAdvertiser(environment, factory, consul, serviceId);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -314,7 +316,7 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         final ConsulAdvertiser advertiser =
             new ConsulAdvertiser(environment, factory, consul, serviceId);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -344,7 +346,7 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         final ConsulAdvertiser advertiser =
             new ConsulAdvertiser(environment, factory, consul, serviceId);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -374,7 +376,7 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(anyString())).thenReturn(false);
         final ConsulAdvertiser advertiser =
             new ConsulAdvertiser(environment, factory, consul, serviceId);
-        advertiser.register("http", 8080, 8081);
+        registerAndEnsureRegistered(advertiser);
 
         final ImmutableRegistration registration =
             ImmutableRegistration.builder()
@@ -392,6 +394,15 @@ class ConsulAdvertiserTest {
                 .build();
 
         verify(agent).register(registration);
+    }
+
+    private static void registerAndEnsureRegistered(ConsulAdvertiser advertiser) {
+        var didRegister = register(advertiser);
+        assertThat(didRegister).isTrue();
+    }
+
+    private static boolean register(ConsulAdvertiser advertiser) {
+        return advertiser.register("http", 8080, 8081);
     }
 
     @Test

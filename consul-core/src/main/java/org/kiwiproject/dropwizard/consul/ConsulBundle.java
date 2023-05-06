@@ -121,7 +121,7 @@ public abstract class ConsulBundle<C extends Configuration>
     }
 
     @Override
-    public void run(C configuration, Environment environment) throws Exception {
+    public void run(C configuration, Environment environment) {
         final ConsulFactory consulConfig = getConsulFactory(configuration);
         if (!consulConfig.isEnabled()) {
             LOGGER.warn("Consul bundle disabled.");
