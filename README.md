@@ -41,17 +41,24 @@ Dependency Info
 ---------------
 
 ```xml
-<dependency>
-    <groupId>org.kiwiproject</groupId>
-    <artifactId>consul-core</artifactId>
-    <version>[current-version]</version>
-</dependency>
 
-<dependency>
-    <groupId>org.kiwiproject</groupId>
-    <artifactId>consul-ribbon</artifactId>
-    <version>[current-version]</version>
-</dependency>
+<dependencies>
+
+    <dependency>
+        <groupId>org.kiwiproject</groupId>
+        <artifactId>consul-core</artifactId>
+        <version>[current-version]</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.kiwiproject</groupId>
+        <artifactId>consul-ribbon</artifactId>
+        <version>[current-version]</version>
+    </dependency>
+
+    <!-- additional dependencies... -->
+
+</dependencies>
 ```
 
 Usage
@@ -61,15 +68,23 @@ your [Application](https://javadoc.io/doc/io.dropwizard/dropwizard-project/lates
 class.
 
 ```java
-@Override
-public void initialize(Bootstrap<MyConfiguration> bootstrap) {
-    // ...
-    bootstrap.addBundle(new ConsulBundle<MyConfiguration>(getName()) {
-        @Override
-        public ConsulFactory getConsulFactory(MyConfiguration configuration) {
-            return configuration.getConsulFactory();
-        }
-    });
+public class MyApplication extends Application<MyConfiguration> {
+
+    @Override
+    public void initialize(Bootstrap<MyConfiguration> bootstrap) {
+        // ...
+        bootstrap.addBundle(new ConsulBundle<MyConfiguration>(getName()) {
+            @Override
+            public ConsulFactory getConsulFactory(MyConfiguration configuration) {
+                return configuration.getConsulFactory();
+            }
+        });
+    }
+
+    @Override
+    public void run(MyConfiguration configuration, Environment environment) {
+        // ...
+    }
 }
 ```
 
@@ -117,8 +132,8 @@ integration points:
 
 - The application is registered as a service with Consul (with
   the [service port](https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference#port)
-  set to the applicationConnectors port in the configuration file.
-- The application will lookup any variables in the configuration file from Consul upon startup (it defaults to
+  set to the applicationConnectors port in the configuration file).
+- The application will look up any variables in the configuration file from Consul upon startup (it defaults to
   connecting to a Consul agent running on `localhost:8500` for this functionality)
 - The application exposes an additional HTTP endpoint for querying Consul for available healthy services:
 
@@ -187,7 +202,7 @@ Content-Length: 870
 ]
 ```
 
-- The application will periodically checkin with Consul every second to notify the service check that it is still alive
+- The application will periodically check in with Consul every second to notify the service check that it is still alive
 - Upon shutdown, the application will deregister itself from Consul
 
 Credits

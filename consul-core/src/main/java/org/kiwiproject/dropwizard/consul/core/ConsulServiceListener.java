@@ -54,7 +54,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         Set<String> hosts = new HashSet<>();
 
         for (Connector connector : server.getConnectors()) {
-            @SuppressWarnings("resource") final ServerConnector serverConnector = (ServerConnector) connector;
+            final ServerConnector serverConnector = (ServerConnector) connector;
             hosts.add(serverConnector.getHost());
             if (APPLICATION_NAME.equals(connector.getName())) {
                 applicationPort = serverConnector.getLocalPort();

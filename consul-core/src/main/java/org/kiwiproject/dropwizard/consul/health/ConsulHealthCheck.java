@@ -23,7 +23,7 @@ public class ConsulHealthCheck extends HealthCheck {
     }
 
     @Override
-    protected Result check() throws Exception {
+    protected Result check() {
         try {
             consul.agentClient().ping();
             return Result.healthy();

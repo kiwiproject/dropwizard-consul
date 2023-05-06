@@ -31,7 +31,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
                 bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
 
         bootstrap.addBundle(
-            new ConsulBundle<HelloWorldConfiguration>(getName(), false, true) {
+            new ConsulBundle<>(getName(), false, true) {
                 @Override
                 public ConsulFactory getConsulFactory(HelloWorldConfiguration configuration) {
                     return configuration.getConsulFactory();
@@ -40,7 +40,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
     }
 
     @Override
-    public void run(HelloWorldConfiguration configuration, Environment environment) throws Exception {
+    public void run(HelloWorldConfiguration configuration, Environment environment) {
         final Consul consul = configuration.getConsulFactory().build();
         final RibbonJerseyClient loadBalancingClient =
             new RibbonJerseyClientBuilder(environment, consul, configuration.getClient())

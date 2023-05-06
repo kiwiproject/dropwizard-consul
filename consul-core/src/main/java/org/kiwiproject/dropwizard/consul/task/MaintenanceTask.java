@@ -30,7 +30,7 @@ public class MaintenanceTask extends Task {
     }
 
     @Override
-    public void execute(Map<String, List<String>> parameters, PrintWriter output) throws Exception {
+    public void execute(Map<String, List<String>> parameters, PrintWriter output) {
 
         if (!parameters.containsKey("enable")) {
             throw new IllegalArgumentException("Parameter \"enable\" not found");
