@@ -13,6 +13,10 @@
     <artifactId>consul-core</artifactId>
     <name>Dropwizard Consul Bundle</name>
 
+    <properties>
+        <commons-net.version>3.9.0</commons-net.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -21,12 +25,11 @@
         <dependency>
             <groupId>com.orbitz.consul</groupId>
             <artifactId>consul-client</artifactId>
-            <version>1.5.3</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.9.0</version>
+            <version>${commons-net.version}</version>
         </dependency>
         <dependency>
             <groupId>org.checkerframework</groupId>
