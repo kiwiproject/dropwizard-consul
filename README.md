@@ -10,8 +10,10 @@ A bundle for using [Consul](https://consul.io) in Dropwizard applications. Featu
 
 * Integrated client-side load balancer based on [Ribbon](https://github.com/netflix/ribbon)
 * Dropwizard health check that monitors reachablility of Consul
-* The Dropwizard service is registered as a Consul service with a Consul-side health check querying the Dropwizard [health check](https://www.dropwizard.io/en/latest/manual/core.html#health-checks)
-* Ability to resolve [configuration](https://www.dropwizard.io/en/latest/manual/core.html#configuration) properties from Consul's KV store
+* The Dropwizard service is registered as a Consul service with a Consul-side health check querying the
+  Dropwizard [health check](https://www.dropwizard.io/en/latest/manual/core.html#health-checks)
+* Ability to resolve [configuration](https://www.dropwizard.io/en/latest/manual/core.html#configuration) properties from
+  Consul's KV store
 * Admin task to toggle Consul's [maintenance](https://www.consul.io/api/agent.html#enable-maintenance-mode) mode
 
 Background
@@ -22,12 +24,13 @@ is now a [public archive](https://docs.github.com/en/repositories/archiving-a-gi
 and is no longer maintained by the original author.
 
 Since we are still using this library in our services which use Dropwizard and Consul, we decided to import the original
-repository and continue maintaining it for our own use, and anyone else who might want to use it.  We make no guarantees
+repository and continue maintaining it for our own use, and anyone else who might want to use it. We make no guarantees
 whatsoever about how long we will maintain it, and also plan to make our own changes such as changing the base package
 name to `org.kiwiproject` to be consistent with our other libraries.
 
 All other [kiwiproject](https://github.com/kiwiproject/) projects are MIT-licensed. However, because the original
-dropwizard-consul uses the Apache 2.0 license, we are keeping the Apache 2.0 license (otherwise to switch to MIT we would
+dropwizard-consul uses the Apache 2.0 license, we are keeping the Apache 2.0 license (otherwise to switch to MIT we
+would
 have to gain consent of all contributors, which we do not want to do).
 
 Another thing to note is that we _imported_ this repository from the original, so that it is a "disconnected fork". We
@@ -36,12 +39,14 @@ we maintain the history that this is a fork , it is completely disconnected and 
 
 Dependency Info
 ---------------
+
 ```xml
 <dependency>
     <groupId>org.kiwiproject</groupId>
     <artifactId>consul-core</artifactId>
     <version>[current-version]</version>
 </dependency>
+
 <dependency>
     <groupId>org.kiwiproject</groupId>
     <artifactId>consul-ribbon</artifactId>
@@ -51,7 +56,9 @@ Dependency Info
 
 Usage
 -----
-Add a `ConsulBundle` to your [Application](https://javadoc.io/doc/io.dropwizard/dropwizard-project/latest/io/dropwizard/core/Application.html) class.
+Add a `ConsulBundle` to
+your [Application](https://javadoc.io/doc/io.dropwizard/dropwizard-project/latest/io/dropwizard/core/Application.html)
+class.
 
 ```java
 @Override
@@ -66,14 +73,17 @@ public void initialize(Bootstrap<MyConfiguration> bootstrap) {
 }
 ```
 
-The bundle also includes a `ConsulSubsitutor` to retrieve configuration values from the Consul KV store. You can define settings in your YAML configuration file:
+The bundle also includes a `ConsulSubsitutor` to retrieve configuration values from the Consul KV store. You can define
+settings in your YAML configuration file:
 
 ```
 template: ${helloworld/template:-Hello, %s!}
 defaultName: ${helloworld/defaultName:-Stranger}
 ```
 
-The setting with the path `helloworld/template` will be looked up in the KV store and will be replaced in the configuration file when the application is started. You can specify a default value after the `:-`. This currently does not support dynamically updating values in a running Dropwizard application.
+The setting with the path `helloworld/template` will be looked up in the KV store and will be replaced in the
+configuration file when the application is started. You can specify a default value after the `:-`. This currently does
+not support dynamically updating values in a running Dropwizard application.
 
 Configuration
 -------------
@@ -92,7 +102,8 @@ consul:
 
 Example Application
 -------------------
-This bundle includes a modified version of the `HelloWorldApplication` from Dropwizard's [Getting Started](https://www.dropwizard.io/en/latest/getting-started.html) documentation.
+This bundle includes a modified version of the `HelloWorldApplication` from
+Dropwizard's [Getting Started](https://www.dropwizard.io/en/latest/getting-started.html) documentation.
 
 You can execute this application by first starting Consul on your local machine then running:
 
@@ -101,11 +112,16 @@ mvn clean package
 java -jar consul-example/target/consul-example-2.0.7-4-SNAPSHOT.jar server consul-example/hello-world.yml
 ```
 
-This will start the application on port `8080` (admin port `8180`). This application demonstrations the following Consul integration points:
+This will start the application on port `8080` (admin port `8180`). This application demonstrations the following Consul
+integration points:
 
-- The application is registered as a service with Consul (with the [service port](https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference#port) set to the applicationConnectors port in the configuration file.
-- The application will lookup any variables in the configuration file from Consul upon startup (it defaults to connecting to a Consul agent running on `localhost:8500` for this functionality)
+- The application is registered as a service with Consul (with
+  the [service port](https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference#port)
+  set to the applicationConnectors port in the configuration file.
+- The application will lookup any variables in the configuration file from Consul upon startup (it defaults to
+  connecting to a Consul agent running on `localhost:8500` for this functionality)
 - The application exposes an additional HTTP endpoint for querying Consul for available healthy services:
+
 ```
 curl -X GET localhost:8080/consul/hello-world -i
 HTTP/1.1 200 OK
@@ -170,6 +186,7 @@ Content-Length: 870
     }
 ]
 ```
+
 - The application will periodically checkin with Consul every second to notify the service check that it is still alive
 - Upon shutdown, the application will deregister itself from Consul
 
@@ -178,11 +195,14 @@ Credits
 This library comes from the [dropwizard-consul](https://github.com/smoketurner/dropwizard-consul) library from
 [Smoketurner](https://github.com/smoketurner/). The following credits are also retained from the original library.
 
-> This bundle was inspired by an older bundle (Dropwizard 0.6.2) that [Chris Gray](https://github.com/chrisgray) created at https://github.com/chrisgray/dropwizard-consul. I also incorporated the configuration provider changes from https://github.com/remmelt/dropwizard-consul-config-provider
+> This bundle was inspired by an older bundle (Dropwizard 0.6.2) that [Chris Gray](https://github.com/chrisgray) created
+> at https://github.com/chrisgray/dropwizard-consul. I also incorporated the configuration provider changes
+> from https://github.com/remmelt/dropwizard-consul-config-provider
 
 Support
 -------
-Please file bug reports and feature requests in [GitHub issues](https://github.com/kiwiproject/dropwizard-consul/issues).
+Please file bug reports and feature requests
+in [GitHub issues](https://github.com/kiwiproject/dropwizard-consul/issues).
 
 License
 -------
@@ -191,4 +211,5 @@ Copyright (c) 2023 Kiwi Project
 
 This library is licensed under the Apache License, Version 2.0.
 
-See http://www.apache.org/licenses/LICENSE-2.0.html or the [LICENSE](LICENSE) file in this repository for the full license text.
+See http://www.apache.org/licenses/LICENSE-2.0.html or the [LICENSE](LICENSE) file in this repository for the full
+license text.

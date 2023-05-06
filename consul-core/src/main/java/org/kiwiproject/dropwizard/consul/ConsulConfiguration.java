@@ -4,5 +4,5 @@ import io.dropwizard.Configuration;
 
 @FunctionalInterface
 public interface ConsulConfiguration<C extends Configuration> {
-  ConsulFactory getConsulFactory(C configuration);
+    ConsulFactory getConsulFactory(C configuration);
 }
