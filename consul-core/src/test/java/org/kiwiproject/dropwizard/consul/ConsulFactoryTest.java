@@ -10,27 +10,27 @@ import org.junit.jupiter.api.Test;
 class ConsulFactoryTest {
 
     @Test
-    public void testEquality() {
+    void testEquality() {
         final ConsulFactory actual = createFullyPopulatedConsulFactory();
         final ConsulFactory expected = createFullyPopulatedConsulFactory();
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void testCorrectlyFormattedSubnet() {
+    void testCorrectlyFormattedSubnet() {
         final ConsulFactory factory = createFullyPopulatedConsulFactory();
         factory.setServiceSubnet("192.168.3.0/24");
         assertThat(factory.getServiceSubnet()).isPresent().contains("192.168.3.0/24");
     }
 
     @Test
-    public void testIncorrectlyFormattedSubnet() {
+    void testIncorrectlyFormattedSubnet() {
         final ConsulFactory factory = createFullyPopulatedConsulFactory();
         assertThatIllegalArgumentException().isThrownBy(() -> factory.setServiceSubnet("192.168.3.0/"));
     }
 
     @Test
-    public void testNotEqual() {
+    void testNotEqual() {
         final ConsulFactory actual = createFullyPopulatedConsulFactory();
         final ConsulFactory expected = createFullyPopulatedConsulFactory();
         expected.setAdminPort(200);
@@ -38,14 +38,14 @@ class ConsulFactoryTest {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode() {
         final ConsulFactory actual = createFullyPopulatedConsulFactory();
         final ConsulFactory expected = createFullyPopulatedConsulFactory();
         assertThat(actual.hashCode()).hasSameHashCodeAs(expected);
     }
 
     @Test
-    public void testMutatedHashCode() {
+    void testMutatedHashCode() {
         final ConsulFactory actual = createFullyPopulatedConsulFactory();
         final ConsulFactory expected = createFullyPopulatedConsulFactory();
         expected.setAdminPort(200);
@@ -53,14 +53,14 @@ class ConsulFactoryTest {
     }
 
     @Test
-    public void testSetServiceName() {
+    void testSetServiceName() {
         ConsulFactory consulFactory = new ConsulFactory();
         String serviceName = "test-service";
         consulFactory.setServiceName(serviceName);
         assertThat(consulFactory.getServiceName()).isEqualTo(serviceName);
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"removal"})
     @Test
     void shouldSetServiceName_WhenUsingDeprecated_SetSeviceName() {
         var consulFactory = new ConsulFactory();

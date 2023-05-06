@@ -38,7 +38,7 @@ class ConsulServiceListenerTest {
     }
 
     @Test
-    public void testRegister() {
+    void testRegister() {
         final ConsulServiceListener listener =
             new ConsulServiceListener(
                 advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));

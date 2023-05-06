@@ -3,7 +3,6 @@ package org.kiwiproject.dropwizard.consul;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
 import io.dropwizard.util.Duration;
@@ -97,7 +96,7 @@ public class ConsulFactory {
     /**
      * @deprecated use {@link #setServiceName(String)}
      */
-    @Deprecated
+    @Deprecated(since = "0.5.0", forRemoval = true)
     @JsonProperty
     public void setSeviceName(@Nullable String serviceName) {
         setServiceName(serviceName);
@@ -240,7 +239,7 @@ public class ConsulFactory {
         // requires an X-Consul-Token header.
         // @see https://www.consul.io/api/index.html#acls
         aclToken.ifPresent(token ->
-            builder.withAclToken(token).withHeaders(ImmutableMap.of(CONSUL_AUTH_HEADER_KEY, token)));
+            builder.withAclToken(token).withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token)));
 
         return builder.build();
     }

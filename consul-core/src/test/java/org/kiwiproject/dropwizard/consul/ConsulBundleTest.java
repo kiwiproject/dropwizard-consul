@@ -42,40 +42,40 @@ class ConsulBundleTest {
     }
 
     @Test
-    public void testDefaultsToEnabled() throws Exception {
+    void testDefaultsToEnabled() throws Exception {
         assertThat(factory.isEnabled()).isTrue();
     }
 
     @Test
-    public void testEnabled() throws Exception {
+    void testEnabled() throws Exception {
         doReturn(true).when(factory).isEnabled();
         bundle.run(config, environment);
         verify(bundle, times(1)).setupEnvironment(factory, environment);
     }
 
     @Test
-    public void testNotEnabled() throws Exception {
+    void testNotEnabled() throws Exception {
         doReturn(false).when(factory).isEnabled();
         bundle.run(config, environment);
         verify(bundle, times(0)).setupEnvironment(factory, environment);
     }
 
     @Test
-    public void testMissingServiceName() throws Exception {
+    void testMissingServiceName() throws Exception {
         factory.setServiceName(null);
         bundle.run(config, environment);
         assertThat(factory.getServiceName()).isEqualTo("test");
     }
 
     @Test
-    public void testPopulatedServiceName() throws Exception {
+    void testPopulatedServiceName() throws Exception {
         factory.setServiceName("test-service-name");
         bundle.run(config, environment);
         assertThat(factory.getServiceName()).isEqualTo("test-service-name");
     }
 
     @Test
-    public void testAclToken() throws Exception {
+    void testAclToken() throws Exception {
         String token = "acl-token";
         factory.setAclToken(token);
         bundle.run(config, environment);
