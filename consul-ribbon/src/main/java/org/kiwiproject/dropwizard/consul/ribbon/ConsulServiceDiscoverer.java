@@ -2,9 +2,10 @@ package org.kiwiproject.dropwizard.consul.ribbon;
 
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.model.health.ServiceHealth;
+
 import java.util.Collection;
 
 @FunctionalInterface
 public interface ConsulServiceDiscoverer {
-  Collection<ServiceHealth> discover(Consul consul);
+    Collection<ServiceHealth> discover(Consul consul);
 }

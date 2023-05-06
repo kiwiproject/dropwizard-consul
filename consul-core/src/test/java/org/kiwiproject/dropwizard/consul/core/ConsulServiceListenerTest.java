@@ -10,46 +10,46 @@ import static org.mockito.Mockito.when;
 
 import com.orbitz.consul.ConsulException;
 import io.dropwizard.util.Duration;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 class ConsulServiceListenerTest {
 
-  private final ConsulAdvertiser advertiser = mock(ConsulAdvertiser.class);
-  private ScheduledExecutorService scheduler;
+    private final ConsulAdvertiser advertiser = mock(ConsulAdvertiser.class);
+    private ScheduledExecutorService scheduler;
 
-  @BeforeEach
-  public void setUp() {
-    scheduler = Executors.newScheduledThreadPool(1);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    if (scheduler != null) {
-      scheduler.shutdownNow();
+    @BeforeEach
+    public void setUp() {
+        scheduler = Executors.newScheduledThreadPool(1);
     }
-  }
 
-  @Test
-  public void testRegister() {
-    final ConsulServiceListener listener =
-        new ConsulServiceListener(
-            advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));
+    @AfterEach
+    public void tearDown() {
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
+    }
 
-    when(advertiser.register(any(), anyInt(), anyInt(), anyCollection()))
-        .thenThrow(new ConsulException("Cannot connect to Consul"))
-        .thenReturn(true);
+    @Test
+    public void testRegister() {
+        final ConsulServiceListener listener =
+            new ConsulServiceListener(
+                advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));
 
-    Collection<String> hosts = Set.of("192.168.1.22");
-    listener.register("http", 0, 0, hosts);
+        when(advertiser.register(any(), anyInt(), anyInt(), anyCollection()))
+            .thenThrow(new ConsulException("Cannot connect to Consul"))
+            .thenReturn(true);
 
-    verify(advertiser, timeout(100).atLeast(1)).register("http", 0, 0, hosts);
-  }
+        Collection<String> hosts = Set.of("192.168.1.22");
+        listener.register("http", 0, 0, hosts);
+
+        verify(advertiser, timeout(100).atLeast(1)).register("http", 0, 0, hosts);
+    }
 }

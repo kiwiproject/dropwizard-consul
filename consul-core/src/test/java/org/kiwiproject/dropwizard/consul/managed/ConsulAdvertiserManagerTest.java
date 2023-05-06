@@ -4,22 +4,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
+import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
-import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
 class ConsulAdvertiserManagerTest {
 
-  private final ConsulAdvertiser advertiser = mock(ConsulAdvertiser.class);
-  private final ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
-  private final ConsulAdvertiserManager manager =
-      new ConsulAdvertiserManager(advertiser, Optional.of(scheduler));
+    private final ConsulAdvertiser advertiser = mock(ConsulAdvertiser.class);
+    private final ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
+    private final ConsulAdvertiserManager manager =
+        new ConsulAdvertiserManager(advertiser, Optional.of(scheduler));
 
-  @Test
-  public void testStop() throws Exception {
-    manager.stop();
-    verify(advertiser).deregister();
-    verify(scheduler).shutdownNow();
-  }
+    @Test
+    public void testStop() throws Exception {
+        manager.stop();
+        verify(advertiser).deregister();
+        verify(scheduler).shutdownNow();
+    }
 }
