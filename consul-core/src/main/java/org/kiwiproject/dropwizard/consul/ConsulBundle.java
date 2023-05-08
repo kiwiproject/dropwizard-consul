@@ -124,10 +124,10 @@ public abstract class ConsulBundle<C extends Configuration>
     @Override
     public void run(C configuration, Environment environment) {
         final ConsulFactory consulConfig = getConsulFactory(configuration);
-        if (!consulConfig.isEnabled()) {
-            LOGGER.warn("Consul bundle disabled.");
-        } else {
+        if (consulConfig.isEnabled()) {
             runEnabled(consulConfig, environment);
+        } else {
+            LOGGER.warn("Consul bundle disabled.");
         }
     }
 

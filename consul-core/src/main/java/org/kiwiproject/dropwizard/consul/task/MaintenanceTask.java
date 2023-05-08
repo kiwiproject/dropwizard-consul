@@ -47,10 +47,10 @@ public class MaintenanceTask extends Task {
         }
 
         if (enable) {
-            if (!isNullOrEmpty(reason)) {
-                LOGGER.warn("Enabling maintenance mode for service {} (reason: {})", serviceId, reason);
-            } else {
+            if (isNullOrEmpty(reason)) {
                 LOGGER.warn("Enabling maintenance mode for service {} (no reason given)", serviceId);
+            } else {
+                LOGGER.warn("Enabling maintenance mode for service {} (reason: {})", serviceId, reason);
             }
         } else {
             LOGGER.warn("Disabling maintenance mode for service {}", serviceId);
