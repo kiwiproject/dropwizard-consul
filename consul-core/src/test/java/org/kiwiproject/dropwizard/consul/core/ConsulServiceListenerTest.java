@@ -1,5 +1,6 @@
 package org.kiwiproject.dropwizard.consul.core;
 
+import static java.util.Objects.nonNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -32,7 +33,7 @@ class ConsulServiceListenerTest {
 
     @AfterEach
     public void tearDown() {
-        if (scheduler != null) {
+        if (nonNull(scheduler)) {
             scheduler.shutdownNow();
         }
     }
