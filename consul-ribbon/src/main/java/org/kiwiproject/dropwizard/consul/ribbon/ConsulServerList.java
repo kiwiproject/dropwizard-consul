@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toList;
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.orbitz.consul.Consul;
+import com.orbitz.consul.model.health.Service;
 import com.orbitz.consul.model.health.ServiceHealth;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -54,22 +55,23 @@ public class ConsulServerList implements ServerList<Server> {
      * has an address defined, use that as the server host, otherwise default to using the node
      * address.
      *
-     * @param service Consul service health record
+     * @param serviceHealth Consul service health record
      * @return Ribbon Server instance
      */
-    private Server buildServer(final ServiceHealth service) {
-        @Nullable final String scheme = service.getService().getMeta().get("scheme");
-        final int port = service.getService().getPort();
+    private Server buildServer(final ServiceHealth serviceHealth) {
+        Service service = serviceHealth.getService();
+        @Nullable final String scheme = service.getMeta().get("scheme");
+        final int port = service.getPort();
 
         final String address;
-        if (!isNullOrEmpty(service.getService().getAddress())) {
-            address = service.getService().getAddress();
+        if (isNullOrEmpty(service.getAddress())) {
+            address = serviceHealth.getNode().getAddress();
         } else {
-            address = service.getNode().getAddress();
+            address = service.getAddress();
         }
 
         final Server server = new Server(scheme, address, port);
-        server.setZone(service.getNode().getDatacenter().orElse(Server.UNKNOWN_ZONE));
+        server.setZone(serviceHealth.getNode().getDatacenter().orElse(Server.UNKNOWN_ZONE));
         server.setReadyToServe(true);
 
         return server;
