@@ -1,6 +1,9 @@
 package org.kiwiproject.dropwizard.consul.ribbon;
 
-import com.google.common.base.Strings;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.orbitz.consul.Consul;
@@ -9,8 +12,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class ConsulServerList implements ServerList<Server> {
 
@@ -24,8 +25,8 @@ public class ConsulServerList implements ServerList<Server> {
      * @param serviceDiscoverer Discoverer
      */
     public ConsulServerList(final Consul consul, final ConsulServiceDiscoverer serviceDiscoverer) {
-        this.consul = Objects.requireNonNull(consul);
-        this.serviceDiscoverer = Objects.requireNonNull(serviceDiscoverer);
+        this.consul = requireNonNull(consul);
+        this.serviceDiscoverer = requireNonNull(serviceDiscoverer);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class ConsulServerList implements ServerList<Server> {
      * @return list of server instances
      */
     private List<Server> buildServerList(final Collection<ServiceHealth> services) {
-        return services.stream().map(this::buildServer).collect(Collectors.toList());
+        return services.stream().map(this::buildServer).collect(toList());
     }
 
     /**
@@ -61,7 +62,7 @@ public class ConsulServerList implements ServerList<Server> {
         final int port = service.getService().getPort();
 
         final String address;
-        if (!Strings.isNullOrEmpty(service.getService().getAddress())) {
+        if (!isNullOrEmpty(service.getService().getAddress())) {
             address = service.getService().getAddress();
         } else {
             address = service.getNode().getAddress();

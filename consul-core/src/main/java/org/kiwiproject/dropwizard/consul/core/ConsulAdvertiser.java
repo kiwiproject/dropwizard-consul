@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.consul.core;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.UriBuilder;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -56,10 +56,10 @@ public class ConsulAdvertiser {
         final Consul consul,
         final String serviceId) {
 
-        this.environment = Objects.requireNonNull(environment, "environment == null");
-        this.configuration = Objects.requireNonNull(configuration, "configuration == null");
-        this.consul = Objects.requireNonNull(consul, "consul == null");
-        this.serviceId = Objects.requireNonNull(serviceId, "serviceId == null");
+        this.environment = requireNonNull(environment, "environment == null");
+        this.configuration = requireNonNull(configuration, "configuration == null");
+        this.consul = requireNonNull(consul, "consul == null");
+        this.serviceId = requireNonNull(serviceId, "serviceId == null");
 
         configuration
             .getServicePort()

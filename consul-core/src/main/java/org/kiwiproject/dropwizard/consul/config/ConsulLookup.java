@@ -1,5 +1,7 @@
 package org.kiwiproject.dropwizard.consul.config;
 
+import static java.util.Objects.requireNonNull;
+
 import com.orbitz.consul.Consul;
 import io.dropwizard.configuration.UndefinedEnvironmentVariableException;
 import org.apache.commons.text.lookup.StringLookup;
@@ -7,7 +9,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -39,7 +40,7 @@ public class ConsulLookup implements StringLookup {
      *                                               strict behavior is enabled.
      */
     public ConsulLookup(final Consul consul, final boolean strict) {
-        this.consul = Objects.requireNonNull(consul);
+        this.consul = requireNonNull(consul);
         this.strict = strict;
     }
 

@@ -1,5 +1,7 @@
 package org.kiwiproject.dropwizard.consul.core;
 
+import static java.util.Objects.requireNonNull;
+
 import com.orbitz.consul.ConsulException;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.util.Duration;
@@ -12,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,9 +41,9 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         final Optional<Duration> retryInterval,
         final Optional<ScheduledExecutorService> scheduler) {
 
-        this.advertiser = Objects.requireNonNull(advertiser, "advertiser == null");
-        this.retryInterval = Objects.requireNonNull(retryInterval, "retryInterval == null");
-        this.scheduler = Objects.requireNonNull(scheduler, "scheduler == null");
+        this.advertiser = requireNonNull(advertiser, "advertiser == null");
+        this.retryInterval = requireNonNull(retryInterval, "retryInterval == null");
+        this.scheduler = requireNonNull(scheduler, "scheduler == null");
     }
 
     @Override

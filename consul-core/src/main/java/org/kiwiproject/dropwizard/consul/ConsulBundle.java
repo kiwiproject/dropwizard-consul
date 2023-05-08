@@ -1,7 +1,9 @@
 package org.kiwiproject.dropwizard.consul;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
@@ -21,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -72,7 +73,7 @@ public abstract class ConsulBundle<C extends Configuration>
     @SuppressWarnings("java:S5993")
     public ConsulBundle(
         final String name, final boolean strict, final boolean substitutionInVariables) {
-        this.defaultServiceName = Objects.requireNonNull(name);
+        this.defaultServiceName = requireNonNull(name);
         this.strict = strict;
         this.substitutionInVariables = substitutionInVariables;
     }
@@ -131,7 +132,7 @@ public abstract class ConsulBundle<C extends Configuration>
     }
 
     protected void runEnabled(ConsulFactory consulConfig, Environment environment) {
-        if (Strings.isNullOrEmpty(consulConfig.getServiceName())) {
+        if (isNullOrEmpty(consulConfig.getServiceName())) {
             consulConfig.setServiceName(defaultServiceName);
         }
         setupEnvironment(consulConfig, environment);
