@@ -200,7 +200,7 @@ public class ConsulAdvertiser {
             ImmutableRegistration.builder().port(servicePort.get()).check(check).id(serviceId);
 
         final String serviceName = configuration.getServiceName();
-        if (serviceName != null) {
+        if (nonNull(serviceName)) {
             builder.name(serviceName);
         }
 
@@ -208,12 +208,12 @@ public class ConsulAdvertiser {
         getServiceAddress(ipAddresses).ifPresent(builder::address);
 
         // If we have tags, add them to the registration.
-        if (tags.get() != null) {
+        if (nonNull(tags.get())) {
             builder.tags(tags.get());
         }
 
         // If we have service meta, add them to the registration.
-        if (serviceMeta.get() != null) {
+        if (nonNull(serviceMeta.get())) {
             builder.meta(serviceMeta.get());
         }
 

@@ -1,5 +1,6 @@
 package org.kiwiproject.dropwizard.consul.ribbon;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.netflix.loadbalancer.Server;
@@ -68,7 +69,7 @@ public class RibbonJerseyClient implements Client, Closeable {
      */
     private Server fetchServerOrThrow() {
         final Server server = loadBalancer.chooseServer();
-        if (server == null) {
+        if (isNull(server)) {
             throw new IllegalStateException("No available servers for " + loadBalancer.getName());
         }
         return server;

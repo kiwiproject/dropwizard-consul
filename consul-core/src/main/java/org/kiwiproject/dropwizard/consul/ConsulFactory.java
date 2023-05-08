@@ -1,5 +1,7 @@
 package org.kiwiproject.dropwizard.consul;
 
+import static java.util.Objects.isNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
@@ -267,7 +269,7 @@ public class ConsulFactory {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (isNull(obj) || getClass() != obj.getClass()) {
             return false;
         }
         final ConsulFactory other = (ConsulFactory) obj;
