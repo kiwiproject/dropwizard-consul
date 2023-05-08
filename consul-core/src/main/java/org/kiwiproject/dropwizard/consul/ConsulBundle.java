@@ -123,30 +123,29 @@ public abstract class ConsulBundle<C extends Configuration>
 
     @Override
     public void run(C configuration, Environment environment) {
-        final ConsulFactory consulConfig = getConsulFactory(configuration);
-        if (consulConfig.isEnabled()) {
-            runEnabled(consulConfig, environment);
+        var consulFactory = getConsulFactory(configuration);
+        if (consulFactory.isEnabled()) {
+            runEnabled(consulFactory, environment);
         } else {
             LOGGER.warn("Consul bundle disabled.");
         }
     }
 
-    protected void runEnabled(ConsulFactory consulConfig, Environment environment) {
-        if (isNullOrEmpty(consulConfig.getServiceName())) {
-            consulConfig.setServiceName(defaultServiceName);
+    protected void runEnabled(ConsulFactory consulFactory, Environment environment) {
+        if (isNullOrEmpty(consulFactory.getServiceName())) {
+            consulFactory.setServiceName(defaultServiceName);
         }
-        setupEnvironment(consulConfig, environment);
+        setupEnvironment(consulFactory, environment);
     }
 
-    protected void setupEnvironment(ConsulFactory consulConfig, Environment environment) {
+    protected void setupEnvironment(ConsulFactory consulFactory, Environment environment) {
 
-        final Consul consul = consulConfig.build();
-        final String serviceId = consulConfig.getServiceId().orElse(UUID.randomUUID().toString());
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, consulConfig, consul, serviceId);
+        var consul = consulFactory.build();
+        var serviceId = consulFactory.getServiceId().orElseGet(() -> UUID.randomUUID().toString());
+        var advertiser = new ConsulAdvertiser(environment, consulFactory, consul, serviceId);
 
-        final Optional<Duration> retryInterval = consulConfig.getRetryInterval();
-        final Optional<ScheduledExecutorService> scheduler =
+        Optional<Duration> retryInterval = consulFactory.getRetryInterval();
+        Optional<ScheduledExecutorService> scheduler =
             retryInterval.map(i -> Executors.newScheduledThreadPool(1));
 
         // Register a Jetty listener to get the listening host and port

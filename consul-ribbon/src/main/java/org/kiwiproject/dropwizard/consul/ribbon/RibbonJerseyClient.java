@@ -68,7 +68,7 @@ public class RibbonJerseyClient implements Client, Closeable {
      * @throws IllegalStateException if no servers are available
      */
     private Server fetchServerOrThrow() {
-        final Server server = loadBalancer.chooseServer();
+        var server = loadBalancer.chooseServer();
         if (isNull(server)) {
             throw new IllegalStateException("No available servers for " + loadBalancer.getName());
         }
@@ -147,12 +147,12 @@ public class RibbonJerseyClient implements Client, Closeable {
      */
     @Override
     public WebTarget target(String uri) {
-        final Server server = fetchServerOrThrow();
-        final UriBuilder builder = UriBuilder.fromUri(uri);
-        builder.scheme(server.getScheme());
-        builder.host(server.getHost());
-        builder.port(server.getPort());
-        return delegate.target(builder);
+        var server = fetchServerOrThrow();
+        var uriBuilder = UriBuilder.fromUri(uri)
+            .scheme(server.getScheme())
+            .host(server.getHost())
+            .port(server.getPort());
+        return delegate.target(uriBuilder);
     }
 
     /**
@@ -162,11 +162,11 @@ public class RibbonJerseyClient implements Client, Closeable {
      */
     @Override
     public WebTarget target(URI uri) {
-        final Server server = fetchServerOrThrow();
-        final UriBuilder builder = UriBuilder.fromUri(uri);
-        builder.scheme(server.getScheme());
-        builder.host(server.getHost());
-        builder.port(server.getPort());
+        var server = fetchServerOrThrow();
+        var builder = UriBuilder.fromUri(uri)
+            .scheme(server.getScheme())
+            .host(server.getHost())
+            .port(server.getPort());
         return delegate.target(builder);
     }
 
@@ -177,10 +177,10 @@ public class RibbonJerseyClient implements Client, Closeable {
      */
     @Override
     public WebTarget target(UriBuilder uriBuilder) {
-        final Server server = fetchServerOrThrow();
-        uriBuilder.scheme(server.getScheme());
-        uriBuilder.host(server.getHost());
-        uriBuilder.port(server.getPort());
+        var server = fetchServerOrThrow();
+        uriBuilder.scheme(server.getScheme())
+            .host(server.getHost())
+            .port(server.getPort());
         return delegate.target(uriBuilder);
     }
 
@@ -191,12 +191,12 @@ public class RibbonJerseyClient implements Client, Closeable {
      */
     @Override
     public WebTarget target(Link link) {
-        final Server server = fetchServerOrThrow();
-        final UriBuilder builder = UriBuilder.fromLink(link);
-        builder.scheme(server.getScheme());
-        builder.host(server.getHost());
-        builder.port(server.getPort());
-        return delegate.target(builder);
+        var server = fetchServerOrThrow();
+        var uriBuilder = UriBuilder.fromLink(link)
+            .scheme(server.getScheme())
+            .host(server.getHost())
+            .port(server.getPort());
+        return delegate.target(uriBuilder);
     }
 
     @Override

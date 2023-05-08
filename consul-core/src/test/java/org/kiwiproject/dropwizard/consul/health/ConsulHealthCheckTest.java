@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.codahale.metrics.health.HealthCheck.Result;
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
@@ -26,16 +25,16 @@ class ConsulHealthCheckTest {
 
     @Test
     void testCheckHealthy() {
-        final Result actual = healthCheck.check();
+        var result = healthCheck.check();
         verify(agent).ping();
-        assertThat(actual.isHealthy()).isTrue();
+        assertThat(result.isHealthy()).isTrue();
     }
 
     @Test
     void testCheckUnhealthy() {
         doThrow(new ConsulException("error")).when(agent).ping();
-        final Result actual = healthCheck.check();
+        var result = healthCheck.check();
         verify(agent).ping();
-        assertThat(actual.isHealthy()).isFalse();
+        assertThat(result.isHealthy()).isFalse();
     }
 }

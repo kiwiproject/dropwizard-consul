@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.toList;
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.orbitz.consul.Consul;
-import com.orbitz.consul.model.health.Service;
 import com.orbitz.consul.model.health.ServiceHealth;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -59,9 +58,9 @@ public class ConsulServerList implements ServerList<Server> {
      * @return Ribbon Server instance
      */
     private Server buildServer(final ServiceHealth serviceHealth) {
-        Service service = serviceHealth.getService();
-        @Nullable final String scheme = service.getMeta().get("scheme");
-        final int port = service.getPort();
+        var service = serviceHealth.getService();
+        @Nullable String scheme = service.getMeta().get("scheme");
+        int port = service.getPort();
 
         final String address;
         if (isNullOrEmpty(service.getAddress())) {
@@ -70,7 +69,7 @@ public class ConsulServerList implements ServerList<Server> {
             address = service.getAddress();
         }
 
-        final Server server = new Server(scheme, address, port);
+        var server = new Server(scheme, address, port);
         server.setZone(serviceHealth.getNode().getDatacenter().orElse(Server.UNKNOWN_ZONE));
         server.setReadyToServe(true);
 

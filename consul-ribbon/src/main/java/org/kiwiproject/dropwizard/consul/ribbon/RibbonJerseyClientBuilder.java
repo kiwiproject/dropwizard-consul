@@ -59,8 +59,7 @@ public class RibbonJerseyClientBuilder {
         final String name, final ConsulServiceDiscoverer serviceDiscoverer) {
 
         // create a new Jersey client
-        final Client jerseyClient =
-            new JerseyClientBuilder(environment).using(configuration).build(name);
+        var jerseyClient = new JerseyClientBuilder(environment).using(configuration).build(name);
 
         return build(name, jerseyClient, serviceDiscoverer);
     }
@@ -90,23 +89,23 @@ public class RibbonJerseyClientBuilder {
         final ConsulServiceDiscoverer serviceDiscoverer) {
 
         // dynamic server list that is refreshed from Consul
-        final ConsulServerList serverList = new ConsulServerList(consul, serviceDiscoverer);
+        var serverList = new ConsulServerList(consul, serviceDiscoverer);
 
         // build a new load balancer based on the configuration
-        final DefaultClientConfigImpl clientConfig = new DefaultClientConfigImpl();
+        var clientConfig = new DefaultClientConfigImpl();
         clientConfig.set(CommonClientConfigKey.AppName, name);
         clientConfig.set(
             CommonClientConfigKey.ServerListRefreshInterval,
             Ints.checkedCast(configuration.getRefreshInterval().toMilliseconds()));
 
-        final ZoneAwareLoadBalancer<Server> loadBalancer =
+        ZoneAwareLoadBalancer<Server> loadBalancer =
             LoadBalancerBuilder.newBuilder()
                 .withClientConfig(clientConfig)
                 .withRule(new WeightedResponseTimeRule())
                 .withDynamicServerList(serverList)
                 .buildDynamicServerListLoadBalancer();
 
-        final RibbonJerseyClient client = new RibbonJerseyClient(loadBalancer, jerseyClient);
+        var client = new RibbonJerseyClient(loadBalancer, jerseyClient);
 
         environment
             .lifecycle()

@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.kiwiproject.dropwizard.consul.ConsulFactory;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -70,19 +69,18 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .id(serviceId)
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -102,19 +100,18 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .id(serviceId)
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -125,22 +122,20 @@ class ConsulAdvertiserTest {
         advertiser.register(
             "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, SECOND_SUBNET_IP, THIRD_SUBNET_IP));
 
-        String healthCheckUrlWithCorrectSubnet =
-            "http://192.168.2.99:8081/admin/" + DEFAULT_HEALTH_CHECK_PATH;
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrlWithCorrectSubnet)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .address(SECOND_SUBNET_IP)
-                .meta(Map.of("scheme", "http"))
-                .id(serviceId)
-                .build();
+        var healthCheckUrlWithCorrectSubnet = "http://192.168.2.99:8081/admin/" + DEFAULT_HEALTH_CHECK_PATH;
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrlWithCorrectSubnet)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .address(SECOND_SUBNET_IP)
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -151,19 +146,18 @@ class ConsulAdvertiserTest {
         advertiser.register(
             "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .id(serviceId)
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -175,21 +169,20 @@ class ConsulAdvertiserTest {
         advertiser.register(
             "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
-        String healthCheckUrlWithCorrectSubnet = "http://192.168.8.99:8081/admin/healthcheck";
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrlWithCorrectSubnet)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .address("192.168.8.99")
-                .id(serviceId)
-                .build();
+        var healthCheckUrlWithCorrectSubnet = "http://192.168.8.99:8081/admin/healthcheck";
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrlWithCorrectSubnet)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .address("192.168.8.99")
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -201,19 +194,18 @@ class ConsulAdvertiserTest {
         advertiser.register(
             "http", 8080, 8081, Arrays.asList(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .id(serviceId)
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -223,20 +215,19 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.register("https", 8080, 8081);
 
-        String httpsHealthCheckUrl = "https://127.0.0.1:8081/admin/healthcheck";
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .port(8080)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(httpsHealthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "https"))
-                .id(serviceId)
-                .build();
+        var httpsHealthCheckUrl = "https://127.0.0.1:8081/admin/healthcheck";
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(httpsHealthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "https"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
@@ -257,108 +248,98 @@ class ConsulAdvertiserTest {
         factory.setServiceAddress("127.0.0.1");
 
         when(agent.isRegistered(anyString())).thenReturn(false);
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, factory, consul, serviceId);
+        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .id(serviceId)
-                .port(8888)
-                .address("127.0.0.1")
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .id(serviceId)
+            .port(8888)
+            .address("127.0.0.1")
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .build();
 
         verify(agent).register(registration);
     }
 
     @Test
     void testTagsFromConfig() {
-        final List<String> tags = Arrays.asList("test", "second-test");
+        var tags = List.of("test", "second-test");
         factory.setTags(tags);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, factory, consul, serviceId);
+        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .tags(tags)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .meta(Map.of("scheme", "http"))
-                .port(8080)
-                .id(serviceId)
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .tags(tags)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .meta(Map.of("scheme", "http"))
+            .port(8080)
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
 
     @Test
     void testAclTokenFromConfig() {
-        String aclToken = "acl-token";
+        var aclToken = "acl-token";
         factory.setAclToken(aclToken);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, factory, consul, serviceId);
+        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .id(serviceId)
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .port(8080)
-                .meta(Map.of("scheme", "http"))
-                .id(serviceId)
-                .build();
+        var registration = ImmutableRegistration.builder()
+            .id(serviceId)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .port(8080)
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
 
         verify(agent).register(registration);
     }
 
     @Test
     void testServiceMetaFromConfig() {
-        final Map<String, String> serviceMeta = new HashMap<>();
-        serviceMeta.put("meta1-key", "meta1-value");
-        serviceMeta.put("meta2-key", "meta2-value");
+        var serviceMeta = Map.of("meta1-key", "meta1-value", "meta2-key", "meta2-value");
         factory.setServiceMeta(serviceMeta);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, factory, consul, serviceId);
+        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .meta(serviceMeta)
-                .putMeta("scheme", "http")
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(healthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
-                .port(8080)
+        var registration = ImmutableRegistration.builder()
+            .meta(serviceMeta)
+            .putMeta("scheme", "http")
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
+            .port(8080)
                 .id(serviceId)
                 .build();
 
@@ -370,25 +351,23 @@ class ConsulAdvertiserTest {
         factory.setServicePort(8888);
         factory.setServiceAddress("127.0.0.1");
         factory.setHealthCheckPath("ping");
-        String configuredHealthCheckUrl = "http://127.0.0.1:8081/admin/ping";
+        var configuredHealthCheckUrl = "http://127.0.0.1:8081/admin/ping";
 
         when(agent.isRegistered(anyString())).thenReturn(false);
-        final ConsulAdvertiser advertiser =
-            new ConsulAdvertiser(environment, factory, consul, serviceId);
+        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
-        final ImmutableRegistration registration =
-            ImmutableRegistration.builder()
-                .id(serviceId)
-                .port(8888)
-                .address("127.0.0.1")
-                .check(
-                    ImmutableRegCheck.builder()
-                        .http(configuredHealthCheckUrl)
-                        .interval("1s")
-                        .deregisterCriticalServiceAfter("1m")
-                        .build())
-                .name("test")
+        var registration = ImmutableRegistration.builder()
+            .id(serviceId)
+            .port(8888)
+            .address("127.0.0.1")
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(configuredHealthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name("test")
                 .meta(Map.of("scheme", "http"))
                 .build();
 
@@ -406,7 +385,7 @@ class ConsulAdvertiserTest {
 
     @Test
     void testDeregister() {
-        final String serviceId = advertiser.getServiceId();
+        var serviceId = advertiser.getServiceId();
         when(agent.isRegistered(serviceId)).thenReturn(true);
         advertiser.deregister();
         verify(agent).deregister(serviceId);
@@ -414,7 +393,7 @@ class ConsulAdvertiserTest {
 
     @Test
     void testDeregisterNotRegistered() {
-        final String serviceId = advertiser.getServiceId();
+        var serviceId = advertiser.getServiceId();
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.deregister();
         verify(agent, never()).deregister(serviceId);

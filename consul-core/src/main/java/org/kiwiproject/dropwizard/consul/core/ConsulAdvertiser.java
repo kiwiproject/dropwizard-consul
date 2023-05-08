@@ -261,7 +261,7 @@ public class ConsulAdvertiser {
      * @return Optional of the host to register as the service address or empty otherwise
      */
     private Optional<String> findFirstEligibleIpBySubnet(Collection<String> ipAddresses) {
-        SubnetUtils subnetUtils = new SubnetUtils(serviceSubnet.get());
+        var subnetUtils = new SubnetUtils(serviceSubnet.get());
         SubnetUtils.SubnetInfo subNetInfo = subnetUtils.getInfo();
         return ipAddresses.stream().filter(subNetInfo::isInRange).findFirst();
     }
@@ -297,12 +297,11 @@ public class ConsulAdvertiser {
      * @return health check URL
      */
     protected String getHealthCheckUrl(String applicationScheme, Collection<String> hosts) {
-        final UriBuilder builder = UriBuilder.fromPath(environment.getAdminContext().getContextPath());
-        builder
+        var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
             .path(healthCheckPath.get())
             .scheme(applicationScheme)
             .host(getServiceAddress(hosts).orElse(LOCALHOST))
             .port(serviceAdminPort.get());
-        return builder.build().toString();
+        return uriBuilder.build().toString();
     }
 }
