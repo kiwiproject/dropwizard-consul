@@ -12,7 +12,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
@@ -81,7 +80,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .id(serviceId)
                 .build();
 
@@ -113,7 +112,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .id(serviceId)
                 .build();
 
@@ -139,7 +138,7 @@ class ConsulAdvertiserTest {
                         .build())
                 .name("test")
                 .address(SECOND_SUBNET_IP)
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .id(serviceId)
                 .build();
 
@@ -162,7 +161,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .id(serviceId)
                 .build();
 
@@ -187,7 +186,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .address("192.168.8.99")
                 .id(serviceId)
                 .build();
@@ -212,7 +211,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .id(serviceId)
                 .build();
 
@@ -235,7 +234,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "https"))
+                .meta(Map.of("scheme", "https"))
                 .id(serviceId)
                 .build();
 
@@ -274,7 +273,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .build();
 
         verify(agent).register(registration);
@@ -300,7 +299,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .port(8080)
                 .id(serviceId)
                 .build();
@@ -329,7 +328,7 @@ class ConsulAdvertiserTest {
                         .build())
                 .name("test")
                 .port(8080)
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .id(serviceId)
                 .build();
 
@@ -390,7 +389,7 @@ class ConsulAdvertiserTest {
                         .deregisterCriticalServiceAfter("1m")
                         .build())
                 .name("test")
-                .meta(ImmutableMap.of("scheme", "http"))
+                .meta(Map.of("scheme", "http"))
                 .build();
 
         verify(agent).register(registration);

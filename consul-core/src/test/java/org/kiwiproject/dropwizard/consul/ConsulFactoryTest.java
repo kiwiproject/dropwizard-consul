@@ -3,9 +3,10 @@ package org.kiwiproject.dropwizard.consul;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-import com.google.common.collect.ImmutableList;
 import io.dropwizard.util.Duration;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 class ConsulFactoryTest {
 
@@ -77,7 +78,7 @@ class ConsulFactoryTest {
         consulFactory.setAdminPort(2000);
         consulFactory.setServiceSubnet("192.168.1.0/24");
         consulFactory.setServiceAddress("localhost");
-        consulFactory.setTags(ImmutableList.of("tag1", "tag2"));
+        consulFactory.setTags(List.of("tag1", "tag2"));
         consulFactory.setRetryInterval(Duration.seconds(5));
         consulFactory.setCheckInterval(Duration.seconds(1));
         consulFactory.setAclToken("acl-token");
