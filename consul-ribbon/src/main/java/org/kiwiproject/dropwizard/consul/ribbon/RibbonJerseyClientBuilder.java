@@ -1,5 +1,7 @@
 package org.kiwiproject.dropwizard.consul.ribbon;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.primitives.Ints;
 import com.netflix.client.config.CommonClientConfigKey;
 import com.netflix.client.config.DefaultClientConfigImpl;
@@ -13,7 +15,6 @@ import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Environment;
 
 import javax.ws.rs.client.Client;
-import java.util.Objects;
 
 public class RibbonJerseyClientBuilder {
 
@@ -32,9 +33,9 @@ public class RibbonJerseyClientBuilder {
         final Environment environment,
         final Consul consul,
         final RibbonJerseyClientConfiguration configuration) {
-        this.environment = Objects.requireNonNull(environment);
-        this.consul = Objects.requireNonNull(consul);
-        this.configuration = Objects.requireNonNull(configuration);
+        this.environment = requireNonNull(environment);
+        this.consul = requireNonNull(consul);
+        this.configuration = requireNonNull(configuration);
     }
 
     /**

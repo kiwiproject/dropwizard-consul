@@ -1,5 +1,8 @@
 package org.kiwiproject.dropwizard.consul.task;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import com.orbitz.consul.Consul;
 import io.dropwizard.servlets.tasks.Task;
@@ -9,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class MaintenanceTask extends Task {
 
@@ -25,8 +27,8 @@ public class MaintenanceTask extends Task {
      */
     public MaintenanceTask(final Consul consul, final String serviceId) {
         super("maintenance");
-        this.consul = Objects.requireNonNull(consul);
-        this.serviceId = Objects.requireNonNull(serviceId);
+        this.consul = requireNonNull(consul);
+        this.serviceId = requireNonNull(serviceId);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class MaintenanceTask extends Task {
         }
 
         if (enable) {
-            if (!Strings.isNullOrEmpty(reason)) {
+            if (!isNullOrEmpty(reason)) {
                 LOGGER.warn("Enabling maintenance mode for service {} (reason: {})", serviceId, reason);
             } else {
                 LOGGER.warn("Enabling maintenance mode for service {} (no reason given)", serviceId);

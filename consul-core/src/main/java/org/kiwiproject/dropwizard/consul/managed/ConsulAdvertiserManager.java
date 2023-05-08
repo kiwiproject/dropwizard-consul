@@ -1,9 +1,11 @@
 package org.kiwiproject.dropwizard.consul.managed;
 
 import io.dropwizard.lifecycle.Managed;
+
+import static java.util.Objects.requireNonNull;
+
 import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -20,8 +22,8 @@ public class ConsulAdvertiserManager implements Managed {
      */
     public ConsulAdvertiserManager(
         final ConsulAdvertiser advertiser, final Optional<ScheduledExecutorService> scheduler) {
-        this.advertiser = Objects.requireNonNull(advertiser, "advertiser == null");
-        this.scheduler = Objects.requireNonNull(scheduler, "scheduler == null");
+        this.advertiser = requireNonNull(advertiser, "advertiser == null");
+        this.scheduler = requireNonNull(scheduler, "scheduler == null");
     }
 
     @Override

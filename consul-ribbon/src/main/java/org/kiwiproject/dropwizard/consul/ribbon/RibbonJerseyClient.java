@@ -1,5 +1,7 @@
 package org.kiwiproject.dropwizard.consul.ribbon;
 
+import static java.util.Objects.requireNonNull;
+
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ZoneAwareLoadBalancer;
 
@@ -15,7 +17,6 @@ import java.io.Closeable;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class RibbonJerseyClient implements Client, Closeable {
     private final ZoneAwareLoadBalancer<Server> loadBalancer;
@@ -29,8 +30,8 @@ public class RibbonJerseyClient implements Client, Closeable {
      */
     public RibbonJerseyClient(
         final ZoneAwareLoadBalancer<Server> loadBalancer, final Client delegate) {
-        this.loadBalancer = Objects.requireNonNull(loadBalancer);
-        this.delegate = Objects.requireNonNull(delegate);
+        this.loadBalancer = requireNonNull(loadBalancer);
+        this.delegate = requireNonNull(delegate);
     }
 
     /**
@@ -46,8 +47,8 @@ public class RibbonJerseyClient implements Client, Closeable {
         @SuppressWarnings("unused") final String scheme,
         final ZoneAwareLoadBalancer<Server> loadBalancer,
         final Client delegate) {
-        this.loadBalancer = Objects.requireNonNull(loadBalancer);
-        this.delegate = Objects.requireNonNull(delegate);
+        this.loadBalancer = requireNonNull(loadBalancer);
+        this.delegate = requireNonNull(delegate);
     }
 
     /**

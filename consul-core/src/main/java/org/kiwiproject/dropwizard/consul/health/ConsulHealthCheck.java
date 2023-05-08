@@ -1,12 +1,12 @@
 package org.kiwiproject.dropwizard.consul.health;
 
+import static java.util.Objects.requireNonNull;
+
 import com.codahale.metrics.health.HealthCheck;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
 
 public class ConsulHealthCheck extends HealthCheck {
 
@@ -19,7 +19,7 @@ public class ConsulHealthCheck extends HealthCheck {
      * @param consul Consul client
      */
     public ConsulHealthCheck(final Consul consul) {
-        this.consul = Objects.requireNonNull(consul);
+        this.consul = requireNonNull(consul);
     }
 
     @Override
