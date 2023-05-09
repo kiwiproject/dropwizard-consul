@@ -76,7 +76,7 @@ class ConsulBundleTest {
 
     @Test
     void testAclToken() {
-        String token = "acl-token";
+        var token = "acl-token";
         factory.setAclToken(token);
         bundle.run(config, environment);
         assertThat(factory.getAclToken()).contains(token);

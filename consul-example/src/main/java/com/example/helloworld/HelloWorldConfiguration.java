@@ -21,7 +21,7 @@ public class HelloWorldConfiguration extends Configuration {
 
     @NotNull
     @Valid
-    public final RibbonJerseyClientConfiguration client = new RibbonJerseyClientConfiguration();
+    public final RibbonJerseyClientConfiguration clientConfig = new RibbonJerseyClientConfiguration();
 
     @JsonProperty
     public String getTemplate() {
@@ -49,7 +49,7 @@ public class HelloWorldConfiguration extends Configuration {
     }
 
     @JsonProperty
-    public RibbonJerseyClientConfiguration getClient() {
-        return client;
+    public RibbonJerseyClientConfiguration getClientConfig() {
+        return clientConfig;
     }
 }

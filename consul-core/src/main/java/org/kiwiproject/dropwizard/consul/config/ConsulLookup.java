@@ -54,7 +54,7 @@ public class ConsulLookup implements StringLookup {
     @Override
     public String lookup(String key) {
         try {
-            final Optional<String> value = consul.keyValueClient().getValueAsString(key);
+            Optional<String> value = consul.keyValueClient().getValueAsString(key);
             if (value.isPresent()) {
                 return value.get();
             }

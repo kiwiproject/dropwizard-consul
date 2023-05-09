@@ -39,7 +39,7 @@ public class HelloWorldResource {
     @Timed
     @Path("/hello-world")
     public Saying sayHello(@QueryParam("name") Optional<String> name) {
-        final String value = String.format(template, name.orElse(defaultName));
+        var value = String.format(template, name.orElse(defaultName));
         return new Saying(counter.incrementAndGet(), value);
     }
 

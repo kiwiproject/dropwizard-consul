@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import com.orbitz.consul.ConsulException;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.util.Duration;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.slf4j.Logger;
@@ -54,8 +53,8 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         int adminPort = -1;
         Set<String> hosts = new HashSet<>();
 
-        for (Connector connector : server.getConnectors()) {
-            final ServerConnector serverConnector = (ServerConnector) connector;
+        for (var connector : server.getConnectors()) {
+            var serverConnector = (ServerConnector) connector;
             hosts.add(serverConnector.getHost());
             if (APPLICATION_NAME.equals(connector.getName())) {
                 applicationPort = serverConnector.getLocalPort();

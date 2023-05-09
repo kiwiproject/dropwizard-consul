@@ -15,7 +15,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -40,15 +39,14 @@ class ConsulServiceListenerTest {
 
     @Test
     void testRegister() {
-        final ConsulServiceListener listener =
-            new ConsulServiceListener(
-                advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));
+        var listener = new ConsulServiceListener(
+            advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));
 
         when(advertiser.register(any(), anyInt(), anyInt(), anyCollection()))
             .thenThrow(new ConsulException("Cannot connect to Consul"))
             .thenReturn(true);
 
-        Collection<String> hosts = Set.of("192.168.1.22");
+        var hosts = Set.of("192.168.1.22");
         listener.register("http", 0, 0, hosts);
 
         verify(advertiser, timeout(100).atLeast(1)).register("http", 0, 0, hosts);
