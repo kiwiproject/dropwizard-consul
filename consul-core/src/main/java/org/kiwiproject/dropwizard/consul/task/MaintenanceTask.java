@@ -1,9 +1,7 @@
 package org.kiwiproject.dropwizard.consul.task;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Strings;
 import com.orbitz.consul.Consul;
 import io.dropwizard.servlets.tasks.Task;
 import org.slf4j.Logger;
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MaintenanceTask extends Task {
 
@@ -39,23 +38,14 @@ public class MaintenanceTask extends Task {
             throw new IllegalArgumentException("Parameter \"enable\" not found");
         }
 
-        String reason;
-        if (parameters.containsKey("reason")) {
-            reason = Strings.nullToEmpty(parameters.get("reason").get(0));
-        } else {
-            reason = "";
-        }
+        List<String> reasons = parameters.getOrDefault("reason", List.of());
+        var reason = reasons.stream().filter(Objects::nonNull).findFirst().orElse("");
 
         var enable = Boolean.parseBoolean(parameters.get("enable").get(0));
-        if (enable) {
-            if (isNullOrEmpty(reason)) {
-                LOG.warn("Enabling maintenance mode for service {} (no reason given)", serviceId);
-            } else {
-                LOG.warn("Enabling maintenance mode for service {} (reason: {})", serviceId, reason);
-            }
-        } else {
-            LOG.warn("Disabling maintenance mode for service {}", serviceId);
-        }
+
+        var action = enable ? "Enabling" : "Disabling";
+        var reasonForLogs = reason.isEmpty() ? "none given" : reason;
+        LOG.warn("{} maintenance mode for service {} (reason: {})", action, serviceId, reasonForLogs);
 
         consul.agentClient().toggleMaintenanceMode(serviceId, enable, reason);
 

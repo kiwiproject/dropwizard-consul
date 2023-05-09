@@ -18,6 +18,7 @@ import java.util.Optional;
 public class ConsulLookup implements StringLookup {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConsulLookup.class);
+
     private final boolean strict;
     private final Consul consul;
 
