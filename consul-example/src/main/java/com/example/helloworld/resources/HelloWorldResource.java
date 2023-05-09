@@ -26,8 +26,7 @@ public class HelloWorldResource {
     private final String defaultName;
     private final AtomicLong counter;
 
-    public HelloWorldResource(
-        Consul consul, RibbonJerseyClient client, String template, String defaultName) {
+    public HelloWorldResource(Consul consul, RibbonJerseyClient client, String template, String defaultName) {
         this.consul = consul;
         this.client = client;
         this.template = template;

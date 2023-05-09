@@ -29,10 +29,9 @@ public class RibbonJerseyClientBuilder {
      * @param consul        Consul client
      * @param configuration Load balancer Configuration
      */
-    public RibbonJerseyClientBuilder(
-        final Environment environment,
-        final Consul consul,
-        final RibbonJerseyClientConfiguration configuration) {
+    public RibbonJerseyClientBuilder(Environment environment,
+                                     Consul consul,
+                                     RibbonJerseyClientConfiguration configuration) {
         this.environment = requireNonNull(environment);
         this.consul = requireNonNull(consul);
         this.configuration = requireNonNull(configuration);
@@ -44,7 +43,7 @@ public class RibbonJerseyClientBuilder {
      * @param name Service name
      * @return new RibbonJerseyClient
      */
-    public RibbonJerseyClient build(final String name) {
+    public RibbonJerseyClient build(String name) {
         return build(name, new HealthyConsulServiceDiscoverer(name));
     }
 
@@ -55,8 +54,7 @@ public class RibbonJerseyClientBuilder {
      * @param serviceDiscoverer Service discoverer
      * @return new RibbonJerseyClient
      */
-    public RibbonJerseyClient build(
-        final String name, final ConsulServiceDiscoverer serviceDiscoverer) {
+    public RibbonJerseyClient build(String name, ConsulServiceDiscoverer serviceDiscoverer) {
 
         // create a new Jersey client
         var jerseyClient = new JerseyClientBuilder(environment).using(configuration).build(name);
@@ -71,7 +69,7 @@ public class RibbonJerseyClientBuilder {
      * @param jerseyClient Jersey Client
      * @return new {@link RibbonJerseyClient}
      */
-    public RibbonJerseyClient build(final String name, final Client jerseyClient) {
+    public RibbonJerseyClient build(String name, Client jerseyClient) {
         return build(name, jerseyClient, new HealthyConsulServiceDiscoverer(name));
     }
 
@@ -83,10 +81,7 @@ public class RibbonJerseyClientBuilder {
      * @param serviceDiscoverer Service discoverer
      * @return new RibbonJerseyClient
      */
-    public RibbonJerseyClient build(
-        final String name,
-        final Client jerseyClient,
-        final ConsulServiceDiscoverer serviceDiscoverer) {
+    public RibbonJerseyClient build(String name, Client jerseyClient, ConsulServiceDiscoverer serviceDiscoverer) {
 
         // dynamic server list that is refreshed from Consul
         var serverList = new ConsulServerList(consul, serviceDiscoverer);

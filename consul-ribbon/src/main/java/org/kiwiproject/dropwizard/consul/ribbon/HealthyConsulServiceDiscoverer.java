@@ -16,12 +16,12 @@ public class HealthyConsulServiceDiscoverer implements ConsulServiceDiscoverer {
      *
      * @param service Service name
      */
-    public HealthyConsulServiceDiscoverer(final String service) {
+    public HealthyConsulServiceDiscoverer(String service) {
         this.service = requireNonNull(service);
     }
 
     @Override
-    public Collection<ServiceHealth> discover(final Consul consul) {
+    public Collection<ServiceHealth> discover(Consul consul) {
         return consul.healthClient().getHealthyServiceInstances(service).getResponse();
     }
 }

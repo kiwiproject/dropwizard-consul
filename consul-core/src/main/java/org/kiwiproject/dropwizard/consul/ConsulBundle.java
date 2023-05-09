@@ -52,7 +52,7 @@ public abstract class ConsulBundle<C extends Configuration>
      * @param name Service Name
      */
     @SuppressWarnings("java:S5993")
-    public ConsulBundle(final String name) {
+    public ConsulBundle(String name) {
         this(name, false);
     }
 
@@ -61,7 +61,7 @@ public abstract class ConsulBundle<C extends Configuration>
      * @param strict If true, the application fails fast if a key cannot be found in Consul KV
      */
     @SuppressWarnings("java:S5993")
-    public ConsulBundle(final String name, final boolean strict) {
+    public ConsulBundle(String name, boolean strict) {
         this(name, strict, false);
     }
 
@@ -71,8 +71,7 @@ public abstract class ConsulBundle<C extends Configuration>
      * @param substitutionInVariables If true, substitution will be done within variable names.
      */
     @SuppressWarnings("java:S5993")
-    public ConsulBundle(
-        final String name, final boolean strict, final boolean substitutionInVariables) {
+    public ConsulBundle(String name, boolean strict, boolean substitutionInVariables) {
         this.defaultServiceName = requireNonNull(name);
         this.strict = strict;
         this.substitutionInVariables = substitutionInVariables;
@@ -86,8 +85,7 @@ public abstract class ConsulBundle<C extends Configuration>
         try {
             LOGGER.debug("Connecting to Consul at {}:{}", getConsulAgentHost(), getConsulAgentPort());
 
-            final Consul.Builder builder =
-                Consul.builder()
+            var consulBuilder = Consul.builder()
                     .withHostAndPort(HostAndPort.fromParts(getConsulAgentHost(), getConsulAgentPort()));
 
             getConsulAclToken()
@@ -101,7 +99,7 @@ public abstract class ConsulBundle<C extends Configuration>
 
                         LOGGER.debug("Using Consul ACL token: {}", token);
 
-                        builder
+                        consulBuilder
                             .withAclToken(token)
                             .withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token));
                     });
@@ -110,7 +108,7 @@ public abstract class ConsulBundle<C extends Configuration>
             bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
                     bootstrap.getConfigurationSourceProvider(),
-                    new ConsulSubstitutor(builder.build(), strict, substitutionInVariables)));
+                    new ConsulSubstitutor(consulBuilder.build(), strict, substitutionInVariables)));
 
         } catch (ConsulException e) {
             LOGGER.warn(
