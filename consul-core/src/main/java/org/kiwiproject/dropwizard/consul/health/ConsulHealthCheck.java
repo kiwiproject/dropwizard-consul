@@ -18,7 +18,7 @@ public class ConsulHealthCheck extends HealthCheck {
      *
      * @param consul Consul client
      */
-    public ConsulHealthCheck(final Consul consul) {
+    public ConsulHealthCheck(Consul consul) {
         this.consul = requireNonNull(consul);
     }
 

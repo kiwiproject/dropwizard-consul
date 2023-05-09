@@ -3,12 +3,10 @@ package org.kiwiproject.dropwizard.consul.core;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.ConsulException;
 import com.orbitz.consul.model.agent.ImmutableRegCheck;
 import com.orbitz.consul.model.agent.ImmutableRegistration;
-import com.orbitz.consul.model.agent.Registration;
 import io.dropwizard.setup.Environment;
 import org.apache.commons.net.util.SubnetUtils;
 import org.kiwiproject.dropwizard.consul.ConsulFactory;
@@ -50,12 +48,7 @@ public class ConsulAdvertiser {
      * @param consul        Consul client
      * @param serviceId     Consul service ID
      */
-    public ConsulAdvertiser(
-        final Environment environment,
-        final ConsulFactory configuration,
-        final Consul consul,
-        final String serviceId) {
-
+    public ConsulAdvertiser(Environment environment, ConsulFactory configuration, Consul consul, String serviceId) {
         this.environment = requireNonNull(environment, "environment == null");
         this.configuration = requireNonNull(configuration, "configuration == null");
         this.consul = requireNonNull(consul, "consul == null");
@@ -146,8 +139,7 @@ public class ConsulAdvertiser {
         return serviceId;
     }
 
-    public boolean register(
-        final String applicationScheme, final int applicationPort, final int adminPort) {
+    public boolean register(String applicationScheme, int applicationPort, int adminPort) {
         return register(applicationScheme, applicationPort, adminPort, null);
     }
 
@@ -161,13 +153,13 @@ public class ConsulAdvertiser {
      * @return true if successfully registered, otherwise false
      * @throws ConsulException When registration fails
      */
-    public boolean register(
-        final String applicationScheme,
-        final int applicationPort,
-        final int adminPort,
-        Collection<String> ipAddresses) {
-        final AgentClient agent = consul.agentClient();
-        if (agent.isRegistered(serviceId)) {
+    public boolean register(String applicationScheme,
+                            int applicationPort,
+                            int adminPort,
+                            Collection<String> ipAddresses) {
+
+        var agentClient = consul.agentClient();
+        if (agentClient.isRegistered(serviceId)) {
             LOGGER.info(
                 "Service ({}) [{}] already registered", configuration.getServiceName(), serviceId);
             return false;
@@ -188,38 +180,39 @@ public class ConsulAdvertiser {
             healthCheckPath.get(),
             configuration.getCheckInterval().toSeconds());
 
-        final Registration.RegCheck check =
-            ImmutableRegCheck.builder()
+        var registrationCheck = ImmutableRegCheck.builder()
                 .http(getHealthCheckUrl(applicationScheme, ipAddresses))
                 .interval(String.format("%ds", configuration.getCheckInterval().toSeconds()))
                 .deregisterCriticalServiceAfter(
                     String.format("%dm", configuration.getDeregisterInterval().toMinutes()))
                 .build();
 
-        final ImmutableRegistration.Builder builder =
-            ImmutableRegistration.builder().port(servicePort.get()).check(check).id(serviceId);
+        var registrationBuilder = ImmutableRegistration.builder()
+                .port(servicePort.get())
+                .check(registrationCheck)
+                .id(serviceId);
 
-        final String serviceName = configuration.getServiceName();
+        var serviceName = configuration.getServiceName();
         if (nonNull(serviceName)) {
-            builder.name(serviceName);
+            registrationBuilder.name(serviceName);
         }
 
         // If we have set the serviceAddress, add it to the registration.
-        getServiceAddress(ipAddresses).ifPresent(builder::address);
+        getServiceAddress(ipAddresses).ifPresent(registrationBuilder::address);
 
         // If we have tags, add them to the registration.
         if (nonNull(tags.get())) {
-            builder.tags(tags.get());
+            registrationBuilder.tags(tags.get());
         }
 
         // If we have service meta, add them to the registration.
         if (nonNull(serviceMeta.get())) {
-            builder.meta(serviceMeta.get());
+            registrationBuilder.meta(serviceMeta.get());
         }
 
-        builder.putMeta("scheme", applicationScheme);
+        registrationBuilder.putMeta("scheme", applicationScheme);
 
-        consul.agentClient().register(builder.build());
+        agentClient.register(registrationBuilder.build());
         return true;
     }
 
@@ -262,7 +255,7 @@ public class ConsulAdvertiser {
      */
     private Optional<String> findFirstEligibleIpBySubnet(Collection<String> ipAddresses) {
         var subnetUtils = new SubnetUtils(serviceSubnet.get());
-        SubnetUtils.SubnetInfo subNetInfo = subnetUtils.getInfo();
+        var subNetInfo = subnetUtils.getInfo();
         return ipAddresses.stream().filter(subNetInfo::isInRange).findFirst();
     }
 
@@ -270,9 +263,9 @@ public class ConsulAdvertiser {
      * Deregister a service from Consul
      */
     public void deregister() {
-        final AgentClient agent = consul.agentClient();
+        var agentClient = consul.agentClient();
         try {
-            if (!agent.isRegistered(serviceId)) {
+            if (!agentClient.isRegistered(serviceId)) {
                 LOGGER.info("No service registered with ID \"{}\"", serviceId);
                 return;
             }
@@ -284,7 +277,7 @@ public class ConsulAdvertiser {
         LOGGER.info("Deregistering service ID \"{}\"", serviceId);
 
         try {
-            consul.agentClient().deregister(serviceId);
+            agentClient.deregister(serviceId);
         } catch (ConsulException e) {
             LOGGER.error("Failed to deregister service from Consul", e);
         }

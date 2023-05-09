@@ -233,7 +233,7 @@ public class ConsulFactory {
     @JsonIgnore
     public Consul build() {
 
-        final Consul.Builder builder = Consul.builder().withHostAndPort(endpoint).withPing(servicePing);
+        var consulBuilder = Consul.builder().withHostAndPort(endpoint).withPing(servicePing);
 
         // setting both acl token here and with header, supplying an auth
         // header. This should cover both use cases: endpoint supports
@@ -241,9 +241,9 @@ public class ConsulFactory {
         // requires an X-Consul-Token header.
         // @see https://www.consul.io/api/index.html#acls
         aclToken.ifPresent(token ->
-            builder.withAclToken(token).withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token)));
+            consulBuilder.withAclToken(token).withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token)));
 
-        return builder.build();
+        return consulBuilder.build();
     }
 
     @Override
@@ -272,7 +272,7 @@ public class ConsulFactory {
         if (isNull(obj) || getClass() != obj.getClass()) {
             return false;
         }
-        final ConsulFactory other = (ConsulFactory) obj;
+        var other = (ConsulFactory) obj;
         return Objects.equals(this.endpoint, other.endpoint)
             && Objects.equals(this.serviceName, other.serviceName)
             && Objects.equals(this.enabled, other.enabled)

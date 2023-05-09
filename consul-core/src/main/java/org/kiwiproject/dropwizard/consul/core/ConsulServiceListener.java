@@ -35,10 +35,9 @@ public class ConsulServiceListener implements ServerLifecycleListener {
      * @param retryInterval When specified, will retry if service registration fails
      * @param scheduler     When specified, will retry if service registration fails
      */
-    public ConsulServiceListener(
-        final ConsulAdvertiser advertiser,
-        final Optional<Duration> retryInterval,
-        final Optional<ScheduledExecutorService> scheduler) {
+    public ConsulServiceListener(ConsulAdvertiser advertiser,
+                                 Optional<Duration> retryInterval,
+                                 Optional<ScheduledExecutorService> scheduler) {
 
         this.advertiser = requireNonNull(advertiser, "advertiser == null");
         this.retryInterval = requireNonNull(retryInterval, "retryInterval == null");
@@ -46,8 +45,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     }
 
     @Override
-    public void serverStarted(final Server server) {
-
+    public void serverStarted(Server server) {
         String applicationScheme = null;
         int applicationPort = -1;
         int adminPort = -1;
@@ -98,8 +96,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
      * @param adminPort         Administration listening port
      * @param hosts             List of addresses the service is bound to.
      */
-    void register(
-        String applicationScheme, int applicationPort, int adminPort, Collection<String> hosts) {
+    void register(String applicationScheme, int applicationPort, int adminPort, Collection<String> hosts) {
         try {
             advertiser.register(applicationScheme, applicationPort, adminPort, hosts);
             scheduler.ifPresent(ScheduledExecutorService::shutdownNow);

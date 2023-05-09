@@ -24,7 +24,7 @@ public class ConsulServerList implements ServerList<Server> {
      * @param consul            Consul client
      * @param serviceDiscoverer Discoverer
      */
-    public ConsulServerList(final Consul consul, final ConsulServiceDiscoverer serviceDiscoverer) {
+    public ConsulServerList(Consul consul, ConsulServiceDiscoverer serviceDiscoverer) {
         this.consul = requireNonNull(consul);
         this.serviceDiscoverer = requireNonNull(serviceDiscoverer);
     }
@@ -45,7 +45,7 @@ public class ConsulServerList implements ServerList<Server> {
      * @param services list of healthy service instances
      * @return list of server instances
      */
-    private List<Server> buildServerList(final Collection<ServiceHealth> services) {
+    private List<Server> buildServerList(Collection<ServiceHealth> services) {
         return services.stream().map(this::buildServer).collect(toList());
     }
 
@@ -57,12 +57,12 @@ public class ConsulServerList implements ServerList<Server> {
      * @param serviceHealth Consul service health record
      * @return Ribbon Server instance
      */
-    private Server buildServer(final ServiceHealth serviceHealth) {
+    private Server buildServer(ServiceHealth serviceHealth) {
         var service = serviceHealth.getService();
         @Nullable String scheme = service.getMeta().get("scheme");
         int port = service.getPort();
 
-        final String address;
+        String address;
         if (isNullOrEmpty(service.getAddress())) {
             address = serviceHealth.getNode().getAddress();
         } else {

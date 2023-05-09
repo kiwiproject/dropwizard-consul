@@ -26,7 +26,7 @@ public class ConsulLookup implements StringLookup {
      *
      * @param consul Consul client
      */
-    public ConsulLookup(final Consul consul) {
+    public ConsulLookup(Consul consul) {
         this(consul, true);
     }
 
@@ -39,7 +39,7 @@ public class ConsulLookup implements StringLookup {
      * @throws UndefinedEnvironmentVariableException if the environment variable doesn't exist and
      *                                               strict behavior is enabled.
      */
-    public ConsulLookup(final Consul consul, final boolean strict) {
+    public ConsulLookup(Consul consul, boolean strict) {
         this.consul = requireNonNull(consul);
         this.strict = strict;
     }

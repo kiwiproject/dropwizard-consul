@@ -29,8 +29,7 @@ public class RibbonJerseyClient implements Client, Closeable {
      * @param loadBalancer Load Balancer
      * @param delegate     Jersey Client delegate
      */
-    public RibbonJerseyClient(
-        final ZoneAwareLoadBalancer<Server> loadBalancer, final Client delegate) {
+    public RibbonJerseyClient(ZoneAwareLoadBalancer<Server> loadBalancer, Client delegate) {
         this.loadBalancer = requireNonNull(loadBalancer);
         this.delegate = requireNonNull(delegate);
     }
@@ -44,10 +43,9 @@ public class RibbonJerseyClient implements Client, Closeable {
      * @deprecated Use non-scheme constructor instead
      */
     @Deprecated(since = "0.5.0", forRemoval = true)
-    public RibbonJerseyClient(
-        @SuppressWarnings("unused") final String scheme,
-        final ZoneAwareLoadBalancer<Server> loadBalancer,
-        final Client delegate) {
+    public RibbonJerseyClient(@SuppressWarnings("unused") String scheme,
+                              ZoneAwareLoadBalancer<Server> loadBalancer,
+                              Client delegate) {
         this.loadBalancer = requireNonNull(loadBalancer);
         this.delegate = requireNonNull(delegate);
     }

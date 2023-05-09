@@ -25,7 +25,7 @@ public class MaintenanceTask extends Task {
      * @param consul    Consul client
      * @param serviceId Service ID to toggle maintenance mode
      */
-    public MaintenanceTask(final Consul consul, final String serviceId) {
+    public MaintenanceTask(Consul consul, String serviceId) {
         super("maintenance");
         this.consul = requireNonNull(consul);
         this.serviceId = requireNonNull(serviceId);
@@ -38,14 +38,14 @@ public class MaintenanceTask extends Task {
             throw new IllegalArgumentException("Parameter \"enable\" not found");
         }
 
-        final boolean enable = Boolean.parseBoolean(parameters.get("enable").get(0));
-        final String reason;
+        String reason;
         if (parameters.containsKey("reason")) {
             reason = Strings.nullToEmpty(parameters.get("reason").get(0));
         } else {
             reason = "";
         }
 
+        var enable = Boolean.parseBoolean(parameters.get("enable").get(0));
         if (enable) {
             if (isNullOrEmpty(reason)) {
                 LOGGER.warn("Enabling maintenance mode for service {} (no reason given)", serviceId);

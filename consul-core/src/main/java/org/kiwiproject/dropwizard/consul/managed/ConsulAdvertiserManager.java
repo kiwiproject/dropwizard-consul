@@ -20,8 +20,7 @@ public class ConsulAdvertiserManager implements Managed {
      * @param advertiser Consul advertiser
      * @param scheduler  Optional retry scheduler
      */
-    public ConsulAdvertiserManager(
-        final ConsulAdvertiser advertiser, final Optional<ScheduledExecutorService> scheduler) {
+    public ConsulAdvertiserManager(ConsulAdvertiser advertiser, Optional<ScheduledExecutorService> scheduler) {
         this.advertiser = requireNonNull(advertiser, "advertiser == null");
         this.scheduler = requireNonNull(scheduler, "scheduler == null");
     }
