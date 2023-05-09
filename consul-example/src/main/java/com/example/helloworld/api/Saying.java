@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 
 public final class Saying {
+
     private final long id;
 
     @Length(max = 3)

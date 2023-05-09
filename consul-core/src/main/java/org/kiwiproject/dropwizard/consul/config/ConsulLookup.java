@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public class ConsulLookup implements StringLookup {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsulLookup.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConsulLookup.class);
     private final boolean strict;
     private final Consul consul;
 
@@ -59,7 +59,7 @@ public class ConsulLookup implements StringLookup {
                 return value.get();
             }
         } catch (Exception e) {
-            LOGGER.warn("Unable to lookup key in consul", e);
+            LOG.warn("Unable to lookup key in consul", e);
         }
 
         if (strict) {

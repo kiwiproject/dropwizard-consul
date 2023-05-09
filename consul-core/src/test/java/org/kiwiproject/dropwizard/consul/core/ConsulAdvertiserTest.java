@@ -30,10 +30,11 @@ import java.util.function.Supplier;
 
 class ConsulAdvertiserTest {
 
-    public static final String SECOND_SUBNET_IP = "192.168.2.99";
-    public static final String FIRST_SUBNET_IP = "192.168.1.53";
-    public static final String THIRD_SUBNET_IP = "192.168.3.32";
+    private static final String SECOND_SUBNET_IP = "192.168.2.99";
+    private static final String FIRST_SUBNET_IP = "192.168.1.53";
+    private static final String THIRD_SUBNET_IP = "192.168.3.32";
     private static final String DEFAULT_HEALTH_CHECK_PATH = "healthcheck";
+
     private final Consul consul = mock(Consul.class);
     private final AgentClient agent = mock(AgentClient.class);
     private final Environment environment = mock(Environment.class);

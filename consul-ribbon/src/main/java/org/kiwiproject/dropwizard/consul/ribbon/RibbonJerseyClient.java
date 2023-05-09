@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RibbonJerseyClient implements Client, Closeable {
+
     private final ZoneAwareLoadBalancer<Server> loadBalancer;
     private final Client delegate;
 

@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class HelloWorldResource {
+
     private final Consul consul;
     private final RibbonJerseyClient client;
     private final String template;

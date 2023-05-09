@@ -39,7 +39,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public abstract class ConsulBundle<C extends Configuration>
     implements ConfiguredBundle<C>, ConsulConfiguration<C> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsulBundle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConsulBundle.class);
     private static final String CONSUL_AUTH_HEADER_KEY = "X-Consul-Token";
 
     private final String defaultServiceName;
@@ -83,7 +83,7 @@ public abstract class ConsulBundle<C extends Configuration>
         // getConsulAgentHost() and getConsulAgentPort() if Consul is not
         // listening on the default localhost:8500.
         try {
-            LOGGER.debug("Connecting to Consul at {}:{}", getConsulAgentHost(), getConsulAgentPort());
+            LOG.debug("Connecting to Consul at {}:{}", getConsulAgentHost(), getConsulAgentPort());
 
             var consulBuilder = Consul.builder()
                     .withHostAndPort(HostAndPort.fromParts(getConsulAgentHost(), getConsulAgentPort()));
@@ -97,7 +97,7 @@ public abstract class ConsulBundle<C extends Configuration>
                         // in which endpoint requires an X-Consul-Token header.
                         // @see https://www.consul.io/api/index.html#acls
 
-                        LOGGER.debug("Using Consul ACL token: {}", token);
+                        LOG.debug("Using Consul ACL token: {}", token);
 
                         consulBuilder
                             .withAclToken(token)
@@ -111,7 +111,7 @@ public abstract class ConsulBundle<C extends Configuration>
                     new ConsulSubstitutor(consulBuilder.build(), strict, substitutionInVariables)));
 
         } catch (ConsulException e) {
-            LOGGER.warn(
+            LOG.warn(
                 "Unable to query Consul running on {}:{}," + " disabling configuration substitution",
                 getConsulAgentHost(),
                 getConsulAgentPort(),
@@ -125,7 +125,7 @@ public abstract class ConsulBundle<C extends Configuration>
         if (consulFactory.isEnabled()) {
             runEnabled(consulFactory, environment);
         } else {
-            LOGGER.warn("Consul bundle disabled.");
+            LOG.warn("Consul bundle disabled.");
         }
     }
 

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 public class ConsulFactory {
+
     private static final String CONSUL_AUTH_HEADER_KEY = "X-Consul-Token";
 
     @NotNull

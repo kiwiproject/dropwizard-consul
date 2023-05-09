@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 public class ConsulAdvertiser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAdvertiser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConsulAdvertiser.class);
     private static final String LOCALHOST = "127.0.0.1";
     private static final String DEFAULT_HEALTH_CHECK_PATH = "healthcheck";
 
@@ -58,7 +58,7 @@ public class ConsulAdvertiser {
             .getServicePort()
             .ifPresent(
                 port -> {
-                    LOGGER.info("Using \"{}\" as servicePort from configuration file", port);
+                    LOG.info("Using \"{}\" as servicePort from configuration file", port);
                     servicePort.set(port);
                 });
 
@@ -66,7 +66,7 @@ public class ConsulAdvertiser {
             .getAdminPort()
             .ifPresent(
                 port -> {
-                    LOGGER.info("Using \"{}\" as adminPort from configuration file", port);
+                    LOG.info("Using \"{}\" as adminPort from configuration file", port);
                     serviceAdminPort.set(port);
                 });
 
@@ -74,7 +74,7 @@ public class ConsulAdvertiser {
             .getServiceAddress()
             .ifPresent(
                 address -> {
-                    LOGGER.info("Using \"{}\" as serviceAddress from configuration file", address);
+                    LOG.info("Using \"{}\" as serviceAddress from configuration file", address);
                     serviceAddress.set(address);
                 });
 
@@ -82,7 +82,7 @@ public class ConsulAdvertiser {
             .getServiceSubnet()
             .ifPresent(
                 subnet -> {
-                    LOGGER.info("Using \"{}\" as serviceSubnet from configuration file", subnet);
+                    LOG.info("Using \"{}\" as serviceSubnet from configuration file", subnet);
                     serviceSubnet.set(subnet);
                 });
 
@@ -90,7 +90,7 @@ public class ConsulAdvertiser {
             .getServiceAddressSupplier()
             .ifPresent(
                 supplier -> {
-                    LOGGER.info("Using \"{}\" as serviceSupplier from configuration file", supplier);
+                    LOG.info("Using \"{}\" as serviceSupplier from configuration file", supplier);
                     serviceAddressSupplier.set(supplier);
                 });
 
@@ -98,7 +98,7 @@ public class ConsulAdvertiser {
             .getTags()
             .ifPresent(
                 newTags -> {
-                    LOGGER.info("Using \"{}\" as tags from the configuration file", newTags);
+                    LOG.info("Using \"{}\" as tags from the configuration file", newTags);
                     tags.set(newTags);
                 });
 
@@ -106,7 +106,7 @@ public class ConsulAdvertiser {
             .getAclToken()
             .ifPresent(
                 token -> {
-                    LOGGER.info("Using \"{}\" as ACL token from the configuration file.", token);
+                    LOG.info("Using \"{}\" as ACL token from the configuration file.", token);
                     aclToken.set(token);
                 });
 
@@ -114,7 +114,7 @@ public class ConsulAdvertiser {
             .getServiceMeta()
             .ifPresent(
                 newServiceMeta -> {
-                    LOGGER.info(
+                    LOG.info(
                         "Using \"{}\" as serviceMeta from the configuration file", newServiceMeta);
                     serviceMeta.set(newServiceMeta);
                 });
@@ -123,7 +123,7 @@ public class ConsulAdvertiser {
             .getHealthCheckPath()
             .ifPresent(
                 newHealthCheckPath -> {
-                    LOGGER.info(
+                    LOG.info(
                         "Using \"{}\" as health check path from the configuration file",
                         newHealthCheckPath);
                     healthCheckPath.set(newHealthCheckPath);
@@ -160,8 +160,7 @@ public class ConsulAdvertiser {
 
         var agentClient = consul.agentClient();
         if (agentClient.isRegistered(serviceId)) {
-            LOGGER.info(
-                "Service ({}) [{}] already registered", configuration.getServiceName(), serviceId);
+            LOG.info("Service ({}) [{}] already registered", configuration.getServiceName(), serviceId);
             return false;
         }
 
@@ -171,7 +170,7 @@ public class ConsulAdvertiser {
         serviceAdminPort.compareAndSet(null, adminPort);
         healthCheckPath.compareAndSet(null, DEFAULT_HEALTH_CHECK_PATH);
 
-        LOGGER.info(
+        LOG.info(
             "Registering service ({}) [{}] on port {} (admin port {}) with a health check at {} with interval of {}s",
             configuration.getServiceName(),
             serviceId,
@@ -240,7 +239,7 @@ public class ConsulAdvertiser {
             try {
                 return Optional.ofNullable(serviceAddressSupplier.get().get());
             } catch (Exception ex) {
-                LOGGER.debug("Service address supplier threw an exception.", ex);
+                LOG.debug("Service address supplier threw an exception.", ex);
             }
         }
         return Optional.empty();
@@ -266,20 +265,20 @@ public class ConsulAdvertiser {
         var agentClient = consul.agentClient();
         try {
             if (!agentClient.isRegistered(serviceId)) {
-                LOGGER.info("No service registered with ID \"{}\"", serviceId);
+                LOG.info("No service registered with ID \"{}\"", serviceId);
                 return;
             }
         } catch (ConsulException e) {
-            LOGGER.error("Failed to determine if service ID \"{}\" is registered", serviceId, e);
+            LOG.error("Failed to determine if service ID \"{}\" is registered", serviceId, e);
             return;
         }
 
-        LOGGER.info("Deregistering service ID \"{}\"", serviceId);
+        LOG.info("Deregistering service ID \"{}\"", serviceId);
 
         try {
             agentClient.deregister(serviceId);
         } catch (ConsulException e) {
-            LOGGER.error("Failed to deregister service from Consul", e);
+            LOG.error("Failed to deregister service from Consul", e);
         }
     }
 

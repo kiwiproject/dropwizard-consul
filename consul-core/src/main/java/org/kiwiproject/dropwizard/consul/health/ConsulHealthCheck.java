@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public class ConsulHealthCheck extends HealthCheck {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsulHealthCheck.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConsulHealthCheck.class);
+
     private final Consul consul;
 
     /**
@@ -28,7 +29,7 @@ public class ConsulHealthCheck extends HealthCheck {
             consul.agentClient().ping();
             return Result.healthy();
         } catch (ConsulException e) {
-            LOGGER.warn("Unable to ping consul", e);
+            LOG.warn("Unable to ping consul", e);
         }
         return Result.unhealthy("Could not ping consul");
     }

@@ -19,7 +19,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ConsulServiceListener implements ServerLifecycleListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsulServiceListener.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(ConsulServiceListener.class);
 
     private static final String APPLICATION_NAME = "application";
     private static final String ADMIN_NAME = "admin";
@@ -66,7 +67,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
             }
         }
 
-        LOGGER.debug(
+        LOG.debug(
             "applicationScheme: {}, applicationPort: {}, adminPort: {}",
             applicationScheme,
             applicationPort,
@@ -101,11 +102,11 @@ public class ConsulServiceListener implements ServerLifecycleListener {
             advertiser.register(applicationScheme, applicationPort, adminPort, hosts);
             scheduler.ifPresent(ScheduledExecutorService::shutdownNow);
         } catch (ConsulException e) {
-            LOGGER.error("Failed to register service in Consul", e);
+            LOG.error("Failed to register service in Consul", e);
 
             retryInterval.ifPresent(interval ->
                 scheduler.ifPresent(service -> {
-                    LOGGER.info("Will try to register service again in {} seconds", interval.toSeconds());
+                    LOG.info("Will try to register service again in {} seconds", interval.toSeconds());
                     service.schedule(
                         () -> register(applicationScheme, applicationPort, adminPort, hosts),
                         interval.toSeconds(),

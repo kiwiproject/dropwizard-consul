@@ -15,7 +15,8 @@ import java.util.Map;
 
 public class MaintenanceTask extends Task {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MaintenanceTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MaintenanceTask.class);
+
     private final Consul consul;
     private final String serviceId;
 
@@ -48,12 +49,12 @@ public class MaintenanceTask extends Task {
         var enable = Boolean.parseBoolean(parameters.get("enable").get(0));
         if (enable) {
             if (isNullOrEmpty(reason)) {
-                LOGGER.warn("Enabling maintenance mode for service {} (no reason given)", serviceId);
+                LOG.warn("Enabling maintenance mode for service {} (no reason given)", serviceId);
             } else {
-                LOGGER.warn("Enabling maintenance mode for service {} (reason: {})", serviceId, reason);
+                LOG.warn("Enabling maintenance mode for service {} (reason: {})", serviceId, reason);
             }
         } else {
-            LOGGER.warn("Disabling maintenance mode for service {}", serviceId);
+            LOG.warn("Disabling maintenance mode for service {}", serviceId);
         }
 
         consul.agentClient().toggleMaintenanceMode(serviceId, enable, reason);
