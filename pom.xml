@@ -32,6 +32,11 @@
         <!-- Versions for required dependencies -->
         <commons-net.version>3.9.0</commons-net.version>
         <kiwi-bom.version>0.30.0</kiwi-bom.version>
+
+        <!-- Sonar properties -->
+        <sonar.projectKey>kiwiproject_dropwizard-consul</sonar.projectKey>
+        <sonar.organization>kiwiproject</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencyManagement>
