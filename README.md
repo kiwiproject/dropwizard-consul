@@ -8,7 +8,6 @@ Introduction
 
 A bundle for using [Consul](https://consul.io) in Dropwizard applications. Features:
 
-* Integrated client-side load balancer based on [Ribbon](https://github.com/netflix/ribbon)
 * Dropwizard health check that monitors reachablility of Consul
 * The Dropwizard service is registered as a Consul service with a Consul-side health check querying the
   Dropwizard [health check](https://www.dropwizard.io/en/latest/manual/core.html#health-checks)
@@ -50,12 +49,6 @@ Dependency Info
         <version>[current-version]</version>
     </dependency>
 
-    <dependency>
-        <groupId>org.kiwiproject</groupId>
-        <artifactId>consul-ribbon</artifactId>
-        <version>[current-version]</version>
-    </dependency>
-
     <!-- additional dependencies... -->
 
 </dependencies>
@@ -63,6 +56,24 @@ Dependency Info
 
 Usage
 -----
+Add a `ConsulFactory` to your
+[Configuration](https://javadoc.io/doc/io.dropwizard/dropwizard-project/latest/io/dropwizard/core/Configuration.html)
+class.
+
+```java
+public class MyConfiguration extends Configuration {
+
+    @NotNull
+    @Valid
+    @JsonProperty
+    private final ConsulFactory consul = new ConsulFactory();
+
+    public ConsulFactory getConsulFactory() {
+        return consul;
+    }
+}
+```
+
 Add a `ConsulBundle` to
 your [Application](https://javadoc.io/doc/io.dropwizard/dropwizard-project/latest/io/dropwizard/core/Application.html)
 class.
@@ -72,7 +83,7 @@ public class MyApplication extends Application<MyConfiguration> {
 
     @Override
     public void initialize(Bootstrap<MyConfiguration> bootstrap) {
-        // ...
+        // Add the bundle
         bootstrap.addBundle(new ConsulBundle<MyConfiguration>(getName()) {
             @Override
             public ConsulFactory getConsulFactory(MyConfiguration configuration) {
@@ -83,127 +94,42 @@ public class MyApplication extends Application<MyConfiguration> {
 
     @Override
     public void run(MyConfiguration configuration, Environment environment) {
+        // Build a Consul instance
+        var consul = configuration.getConsulFactory().build();
+
         // ...
     }
 }
 ```
 
 The bundle also includes a `ConsulSubsitutor` to retrieve configuration values from the Consul KV store. You can define
-settings in your YAML configuration file:
+settings in your YAML configuration file, for example:
 
 ```
 template: ${helloworld/template:-Hello, %s!}
 defaultName: ${helloworld/defaultName:-Stranger}
 ```
 
-The setting with the path `helloworld/template` will be looked up in the KV store and will be replaced in the
+The setting with the path `helloworld/template` will be looked up in the Consul KV store and will be replaced in the
 configuration file when the application is started. You can specify a default value after the `:-`. This currently does
 not support dynamically updating values in a running Dropwizard application.
 
 Configuration
 -------------
-For configuring the Consul connection, there is a `ConsulFactory`:
+For configuring the Consul connection, you can configure the `ConsulFactory` in your Dropwizard configuration file:
 
 ```yaml
 consul:
   # Optional properties
   # endpoint for consul (defaults to localhost:8500)
   endpoint: localhost:8500
+  
   # service port
   servicePort: 8080
+
   # check interval frequency
   checkInterval: 1 second
 ```
-
-Example Application
--------------------
-This bundle includes a modified version of the `HelloWorldApplication` from
-Dropwizard's [Getting Started](https://www.dropwizard.io/en/latest/getting-started.html) documentation.
-
-You can execute this application by first starting Consul on your local machine then running:
-
-```
-mvn clean package
-java -jar consul-example/target/consul-example-2.0.7-4-SNAPSHOT.jar server consul-example/hello-world.yml
-```
-
-This will start the application on port `8080` (admin port `8180`). This application demonstrations the following Consul
-integration points:
-
-- The application is registered as a service with Consul (with
-  the [service port](https://developer.hashicorp.com/consul/docs/services/configuration/services-configuration-reference#port)
-  set to the applicationConnectors port in the configuration file).
-- The application will look up any variables in the configuration file from Consul upon startup (it defaults to
-  connecting to a Consul agent running on `localhost:8500` for this functionality)
-- The application exposes an additional HTTP endpoint for querying Consul for available healthy services:
-
-```
-curl -X GET localhost:8080/consul/hello-world -i
-HTTP/1.1 200 OK
-Date: Mon, 25 Jan 2016 03:42:10 GMT
-Content-Type: application/json
-Vary: Accept-Encoding
-Content-Length: 870
-
-[
-    {
-        "Node": {
-            "Node": "mac",
-            "Address": "192.168.1.100",
-            "Datacenter": "dc1",
-            "TaggedAddresses": {
-                "wan": "192.168.1.100",
-                "lan": "192.168.1.100"
-            },
-            "Meta": {
-                "consul-network-segment": ""
-            }
-        },
-        "Service": {
-            "ID": "test123",
-            "Service": "hello-world",
-            "EnableTagOverride": false,
-            "Tags": [],
-            "Address": "",
-            "Meta": {
-                "scheme": "http"
-            },
-            "Port": 8080,
-            "Weights": {
-                "Passing": 1,
-                "Warning": 1
-            }
-        },
-        "Checks": [
-            {
-                "Node": "mac",
-                "CheckID": "serfHealth",
-                "Name": "Serf Health Status",
-                "Status": "passing",
-                "Notes": "",
-                "Output": "Agent alive and reachable",
-                "ServiceID": "",
-                "ServiceName": "",
-                "ServiceTags": []
-            },
-            {
-                "Node": "mac",
-                "CheckID": "service:test123",
-                "Name": "Service 'hello-world' check",
-                "Status": "passing",
-                "Notes": "",
-                "Output": "HTTP GET http:\/\/127.0.0.1:8180\/healthcheck: 200 OK Output: {\"consul\":{\"healthy\":true},\"deadlocks\":{\"healthy\":true}}",
-                "ServiceID": "test123",
-                "ServiceName": "hello-world",
-                "ServiceTags": []
-            }
-        ]
-    }
-]
-```
-
-- The application will periodically check in with Consul every second to notify the service check that it is still alive
-- Upon shutdown, the application will deregister itself from Consul
 
 Credits
 -------

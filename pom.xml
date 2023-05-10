@@ -19,8 +19,6 @@
 
     <modules>
         <module>consul-core</module>
-        <module>consul-ribbon</module>
-        <module>consul-example</module>
     </modules>
 
     <scm>
