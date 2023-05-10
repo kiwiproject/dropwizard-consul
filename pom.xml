@@ -3,6 +3,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.kiwiproject</groupId>
         <artifactId>kiwi-parent</artifactId>
@@ -11,15 +12,14 @@
 
     <artifactId>dropwizard-consul</artifactId>
     <version>0.5.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
-    <name>dropwizard-consul</name>
-    <description>Dropwizard Consul Bundle</description>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        A bundle for using Consul in Dropwizard applications.
+    </description>
     <url>https://github.com/kiwiproject/dropwizard-consul</url>
-
-    <modules>
-        <module>consul-core</module>
-    </modules>
+    <inceptionYear>2023</inceptionYear>
 
     <scm>
         <connection>scm:git:https://github.com/kiwiproject/dropwizard-consul.git</connection>
@@ -29,6 +29,8 @@
     </scm>
 
     <properties>
+        <!-- Versions for required dependencies -->
+        <commons-net.version>3.9.0</commons-net.version>
         <kiwi-bom.version>0.30.0</kiwi-bom.version>
     </properties>
 
@@ -43,4 +45,27 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.orbitz.consul</groupId>
+            <artifactId>consul-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons-net.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+        </dependency>
+    </dependencies>
 </project>
