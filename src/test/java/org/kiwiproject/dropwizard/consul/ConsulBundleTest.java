@@ -1,16 +1,20 @@
 package org.kiwiproject.dropwizard.consul;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.dropwizard.Configuration;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ConsulBundleTest {
@@ -39,6 +43,31 @@ class ConsulBundleTest {
                 });
 
         doNothing().when(bundle).setupEnvironment(factory, environment);
+    }
+
+    @Nested
+    class Initialize {
+
+        @Test
+        void shouldReportWhenInitializationHasNotYetOccurred() {
+            assertThat(bundle.didAttemptInitialize()).isFalse();
+        }
+
+        @Test
+        void shouldReportInitializationSuccessAsFalse_WhenInitializationHasNotBeenAttemptedYet() {
+            assertThat(bundle.didInitializeSucceed()).isFalse();
+        }
+
+        @Test
+        void shouldNotAllowConsulExceptionToEscape_WhenUnableToConnecttoConsul() {
+            var bootstrap = mock(Bootstrap.class);
+            assertThatCode(() -> bundle.initialize(bootstrap)).doesNotThrowAnyException();
+
+            assertThat(bundle.didAttemptInitialize()).isTrue();
+            assertThat(bundle.didInitializeSucceed()).isFalse();
+
+            verifyNoInteractions(bootstrap);  // should throw before trying to set up the ConfigurationSourceProvider
+        }
     }
 
     @Test
