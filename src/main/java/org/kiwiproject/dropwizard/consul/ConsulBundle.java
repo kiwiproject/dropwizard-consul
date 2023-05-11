@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Replace variables with values from Consul KV. By default, this only works with a Consul agent
@@ -45,6 +46,9 @@ public abstract class ConsulBundle<C extends Configuration>
     private final String defaultServiceName;
     private final boolean strict;
     private final boolean substitutionInVariables;
+
+    private final AtomicBoolean initializeAttempted;
+    private final AtomicBoolean initializeSucceeded;
 
     /**
      * Constructor
@@ -75,18 +79,24 @@ public abstract class ConsulBundle<C extends Configuration>
         this.defaultServiceName = requireNonNull(name);
         this.strict = strict;
         this.substitutionInVariables = substitutionInVariables;
+        this.initializeAttempted = new AtomicBoolean();
+        this.initializeSucceeded = new AtomicBoolean();
     }
 
     @Override
     public void initialize(Bootstrap<?> bootstrap) {
+        initializeAttempted.set(true);
+
         // Replace variables with values from Consul KV. Please override
         // getConsulAgentHost() and getConsulAgentPort() if Consul is not
         // listening on the default localhost:8500.
+        var consulAgentHost = getConsulAgentHost();
+        var consulAgentPort = getConsulAgentPort();
         try {
-            LOG.debug("Connecting to Consul at {}:{}", getConsulAgentHost(), getConsulAgentPort());
+            LOG.debug("Connecting to Consul at {}:{}", consulAgentHost, consulAgentPort);
 
             var consulBuilder = Consul.builder()
-                    .withHostAndPort(HostAndPort.fromParts(getConsulAgentHost(), getConsulAgentPort()));
+                    .withHostAndPort(HostAndPort.fromParts(consulAgentHost, consulAgentPort));
 
             getConsulAclToken()
                 .ifPresent(
@@ -105,17 +115,21 @@ public abstract class ConsulBundle<C extends Configuration>
                     });
 
             // using Consul as a configuration substitution provider
+            var consul = consulBuilder.build();
             bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
                     bootstrap.getConfigurationSourceProvider(),
-                    new ConsulSubstitutor(consulBuilder.build(), strict, substitutionInVariables)));
+                    new ConsulSubstitutor(consul, strict, substitutionInVariables)));
 
+            LOG.info("ConsulBundle successfully initialized");
+            initializeSucceeded.set(true);
         } catch (ConsulException e) {
+            initializeSucceeded.set(false);
             LOG.warn(
-                "Unable to query Consul running on {}:{}," + " disabling configuration substitution",
-                getConsulAgentHost(),
-                getConsulAgentPort(),
-                e);
+                "Unable to query Consul at {}:{}, so cannot perform configuration substitution from Consul KV (enable DEBUG to see stack trace)",
+                consulAgentHost,
+                consulAgentPort);
+            LOG.debug("Stack trace for failure to connect to Consul at {}:{}", consulAgentHost, consulAgentPort, e);
         }
     }
 
@@ -193,5 +207,26 @@ public abstract class ConsulBundle<C extends Configuration>
     @VisibleForTesting
     public Optional<String> getConsulAclToken() {
         return Optional.empty();
+    }
+
+    /**
+     * Checks whether Dropwizard has attempted to initialize this bundle.
+     *
+     * @return true if Dropwizard called {@link #initialize(Bootstrap)}, false otherwise
+     */
+    public boolean didAttemptInitialize() {
+        return initializeAttempted.get();
+    }
+
+    /**
+     * Check whether this bundle has been <em>successfully</em> initialized.
+     * <p>
+     * Note that if {@link #didAttemptInitialize()} returns false, then this method will always
+     * return false (it cannot report success if initialization has not been attempted).
+     *
+     * @return true if {@link #initialize(Bootstrap)} executed without error, false otherwise
+     */
+    public boolean didInitializeSucceed() {
+        return initializeSucceeded.get();
     }
 }
