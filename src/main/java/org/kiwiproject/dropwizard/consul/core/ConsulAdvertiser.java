@@ -106,7 +106,7 @@ public class ConsulAdvertiser {
             .getAclToken()
             .ifPresent(
                 token -> {
-                    LOG.info("Using \"{}\" as ACL token from the configuration file.", token);
+                    LOG.info("Using ACL token from the configuration file (value intentionally not shown)");
                     aclToken.set(token);
                 });
 
