@@ -107,7 +107,7 @@ public abstract class ConsulBundle<C extends Configuration>
                         // in which endpoint requires an X-Consul-Token header.
                         // @see https://www.consul.io/api/index.html#acls
 
-                        LOG.debug("Using Consul ACL token: {}", token);
+                        LOG.debug("Using Consul ACL token from configuration (value intentionally not shown)");
 
                         consulBuilder
                             .withAclToken(token)
