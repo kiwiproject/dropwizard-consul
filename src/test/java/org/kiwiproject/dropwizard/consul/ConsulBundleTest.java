@@ -10,12 +10,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.orbitz.consul.config.CacheConfig;
+import com.orbitz.consul.config.ClientConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 class ConsulBundleTest {
 
@@ -101,6 +106,24 @@ class ConsulBundleTest {
         factory.setServiceName("test-service-name");
         bundle.run(config, environment);
         assertThat(factory.getServiceName()).isEqualTo("test-service-name");
+    }
+
+    @Test
+    void shouldSetConsulClientConfigurationProperties() {
+        var cacheConfig = CacheConfig.builder().withWatchDuration(Duration.of(20, ChronoUnit.SECONDS)).build();
+        var clientConfig = new ClientConfig(cacheConfig);
+
+        factory.setNetworkWriteTimeoutMillis(5_000L);
+        factory.setNetworkReadTimeoutMillis(10_005L);
+        factory.setClientConfig(clientConfig);
+
+        bundle.run(config, environment);
+
+        assertThat(factory.getNetworkWriteTimeoutMillis()).contains(5_000L);
+        assertThat(factory.getNetworkReadTimeoutMillis()).contains(10_005L);
+        assertThat(factory.getClientConfig()).hasValueSatisfying(theClientConfig -> {
+            assertThat(theClientConfig.getCacheConfig().getWatchDuration().toSeconds()).isEqualTo(20L);
+        });
     }
 
     @Test

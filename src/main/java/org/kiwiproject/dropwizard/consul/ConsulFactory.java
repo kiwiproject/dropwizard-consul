@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
+import com.orbitz.consul.config.ClientConfig;
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
 import org.apache.commons.net.util.SubnetUtils;
@@ -54,6 +55,12 @@ public class ConsulFactory {
     private Duration deregisterInterval = Duration.minutes(1);
 
     private Optional<String> healthCheckPath = Optional.empty();
+
+    private Optional<Long> networkWriteTimeoutMillis = Optional.empty();
+
+    private Optional<Long> networkReadTimeoutMillis = Optional.empty();
+
+    private Optional<ClientConfig> clientConfig = Optional.empty();
 
     @JsonProperty
     public boolean isEnabled() {
@@ -231,6 +238,30 @@ public class ConsulFactory {
         this.healthCheckPath = Optional.ofNullable(healthCheckPath);
     }
 
+    public Optional<Long> getNetworkWriteTimeoutMillis() {
+        return networkWriteTimeoutMillis;
+    }
+
+    public void setNetworkWriteTimeoutMillis(Long networkTimeout) {
+        this.networkWriteTimeoutMillis = Optional.ofNullable(networkTimeout);
+    }
+
+    public Optional<Long> getNetworkReadTimeoutMillis() {
+        return networkReadTimeoutMillis;
+    }
+
+    public void setNetworkReadTimeoutMillis(Long networkReadTimeoutMillis) {
+        this.networkReadTimeoutMillis = Optional.ofNullable(networkReadTimeoutMillis);
+    }
+
+    public Optional<ClientConfig> getClientConfig() {
+        return clientConfig;
+    }
+
+    public void setClientConfig(ClientConfig clientConfig) {
+        this.clientConfig = Optional.ofNullable(clientConfig);
+    }
+
     @JsonIgnore
     public Consul build() {
 
@@ -243,6 +274,10 @@ public class ConsulFactory {
         // @see https://www.consul.io/api/index.html#acls
         aclToken.ifPresent(token ->
             consulBuilder.withAclToken(token).withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token)));
+
+        networkWriteTimeoutMillis.ifPresent(consulBuilder::withWriteTimeoutMillis);
+        networkReadTimeoutMillis.ifPresent(consulBuilder::withReadTimeoutMillis);
+        clientConfig.ifPresent(consulBuilder::withClientConfiguration);
 
         return consulBuilder.build();
     }
