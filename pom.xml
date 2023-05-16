@@ -33,6 +33,9 @@
         <commons-net.version>3.9.0</commons-net.version>
         <kiwi-bom.version>0.30.0</kiwi-bom.version>
 
+        <!-- Versions for test dependencies -->
+        <test-containers.version>1.18.1</test-containers.version>
+
         <!-- Sonar properties -->
         <sonar.projectKey>kiwiproject_dropwizard-consul</sonar.projectKey>
         <sonar.organization>kiwiproject</sonar.organization>
@@ -45,6 +48,14 @@
                 <groupId>org.kiwiproject</groupId>
                 <artifactId>kiwi-bom</artifactId>
                 <version>${kiwi-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${test-containers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -71,6 +82,26 @@
         <dependency>
             <groupId>org.checkerframework</groupId>
             <artifactId>checker-qual</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>consul</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
