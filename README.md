@@ -7,7 +7,11 @@ Dropwizard Consul Bundle
 [![CodeQL](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/codeql.yml/badge.svg)](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/codeql.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-_This README is a work in progress as we transition dropwizard-consul from smoketurner to kiwiproject._
+---
+
+🥝 _This README is a work in progress as we transition dropwizard-consul from smoketurner to kiwiproject._ 🥝
+
+---
 
 Introduction
 ------------
