@@ -49,6 +49,8 @@ we maintain the history that this is a fork , it is completely disconnected and 
 Dependency Info
 ---------------
 
+In a Maven POM, use the following:
+
 ```xml
 
 <dependencies>
@@ -63,6 +65,8 @@ Dependency Info
 
 </dependencies>
 ```
+
+Use the same group, artifact and version if using other build tools like Gradle, SBT, Grape, etc.
 
 Usage
 -----
@@ -139,6 +143,47 @@ consul:
 
   # check interval frequency
   checkInterval: 1 second
+```
+
+Migrating from smoketurner/dropwizard-consul
+--------------------------------------------
+To migrate an existing project from [smoketurner/dropwizard-consul](https://github.com/smoketurner/dropwizard-consul), you need
+to:
+
+1. Change the group in your build file (i.e. Maven POM, Gradle) from `com.smoketurner.dropwizard` to `org.kiwiproject`
+2. Change the base package in your code from `com.smoketurner.dropwizard` to `org.kiwiproject.dropwizard`
+
+In a Maven POM, you would change:
+
+```xml
+<dependency>
+    <groupId>com.smoketurner.dropwizard</groupId>
+    <artifactId>consul-core</artifactId>
+    <version>[version]</version>
+</dependency>
+```
+
+to
+
+```xml
+<dependency>
+    <groupId>org.kiwiproject</groupId>
+    <artifactId>consul-core</artifactId>
+    <version>[current-version]</version>
+</dependency>
+```
+
+The class names from the original `smoketurner/dropwizard-consul` library are the same, so for example importing
+`ConsulBundle` changes from:
+
+```java
+import com.smoketurner.dropwizard.consul.ConsulBundle;
+```
+
+to
+
+```java
+import org.kiwiproject.dropwizard.consul.ConsulBundle;
 ```
 
 Credits
