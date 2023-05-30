@@ -31,7 +31,7 @@
     <properties>
         <!-- Versions for required dependencies -->
         <commons-net.version>3.9.0</commons-net.version>
-        <kiwi-bom.version>0.30.0</kiwi-bom.version>
+        <kiwi-bom.version>0.31.0</kiwi-bom.version>
 
         <!-- Versions for test dependencies -->
         <test-containers.version>1.18.1</test-containers.version>
