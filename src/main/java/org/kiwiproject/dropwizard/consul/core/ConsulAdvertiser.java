@@ -286,6 +286,7 @@ public class ConsulAdvertiser {
      * Return the health check URL for the service
      *
      * @param applicationScheme Scheme the server is listening on
+     * @param hosts             the hosts to choose from
      * @return health check URL
      */
     protected String getHealthCheckUrl(String applicationScheme, Collection<String> hosts) {

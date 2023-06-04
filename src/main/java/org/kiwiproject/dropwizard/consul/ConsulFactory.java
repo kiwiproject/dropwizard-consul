@@ -104,6 +104,7 @@ public class ConsulFactory {
     }
 
     /**
+     * @param serviceName the service name to use
      * @deprecated use {@link #setServiceName(String)}
      */
     @Deprecated(since = "0.5.0", forRemoval = true)
