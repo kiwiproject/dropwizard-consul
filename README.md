@@ -5,7 +5,9 @@ Dropwizard Consul Bundle
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kiwiproject_dropwizard-consul&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=kiwiproject_dropwizard-consul)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=kiwiproject_dropwizard-consul&metric=coverage)](https://sonarcloud.io/summary/new_code?id=kiwiproject_dropwizard-consul)
 [![CodeQL](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/codeql.yml/badge.svg)](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/codeql.yml)
+[![javadoc](https://javadoc.io/badge2/org.kiwiproject/dropwizard-consul/javadoc.svg)](https://javadoc.io/doc/org.kiwiproject/dropwizard-consul)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Maven Central](https://img.shields.io/maven-central/v/org.kiwiproject/dropwizard-consul)](https://central.sonatype.com/artifact/org.kiwiproject/dropwizard-consul/)
 
 ---
 
