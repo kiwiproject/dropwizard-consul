@@ -102,17 +102,7 @@ public class ConsulFactory {
     public void setServiceName(@Nullable String serviceName) {
         this.serviceName = serviceName;
     }
-
-    /**
-     * @param serviceName the service name to use
-     * @deprecated use {@link #setServiceName(String)}
-     */
-    @Deprecated(since = "0.5.0", forRemoval = true)
-    @JsonProperty
-    public void setSeviceName(@Nullable String serviceName) {
-        setServiceName(serviceName);
-    }
-
+    
     @JsonProperty
     public Optional<Iterable<String>> getTags() {
         return tags;

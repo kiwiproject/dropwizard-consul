@@ -61,15 +61,6 @@ class ConsulFactoryTest {
         assertThat(consulFactory.getServiceName()).isEqualTo(serviceName);
     }
 
-    @SuppressWarnings({"removal"})
-    @Test
-    void shouldSetServiceName_WhenUsingDeprecated_SetSeviceName() {
-        var consulFactory = new ConsulFactory();
-        var serviceName = "test-service";
-        consulFactory.setSeviceName(serviceName);
-        assertThat(consulFactory.getServiceName()).isEqualTo(serviceName);
-    }
-
     private ConsulFactory createFullyPopulatedConsulFactory() {
         var consulFactory = new ConsulFactory();
         consulFactory.setServiceName("serviceName");
