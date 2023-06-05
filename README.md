@@ -59,7 +59,7 @@ In a Maven POM, use the following:
 
     <dependency>
         <groupId>org.kiwiproject</groupId>
-        <artifactId>consul-core</artifactId>
+        <artifactId>dropwizard-consul</artifactId>
         <version>[current-version]</version>
     </dependency>
 
@@ -170,7 +170,7 @@ to
 ```xml
 <dependency>
     <groupId>org.kiwiproject</groupId>
-    <artifactId>consul-core</artifactId>
+    <artifactId>dropwizard-consul</artifactId>
     <version>[current-version]</version>
 </dependency>
 ```
