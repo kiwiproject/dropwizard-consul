@@ -65,7 +65,7 @@ class ConsulBundleTest {
         }
 
         @Test
-        void shouldNotAllowConsulExceptionToEscape_WhenUnableToConnecttoConsul() {
+        void shouldNotAllowConsulExceptionToEscape_WhenUnableToConnectToConsul() {
             var bootstrap = mock(Bootstrap.class);
             var openPort = new LocalPortChecker().findRandomOpenPort().orElseThrow();
             doReturn(openPort).when(bundle).getConsulAgentPort();
@@ -124,9 +124,8 @@ class ConsulBundleTest {
 
         assertThat(factory.getNetworkWriteTimeoutMillis()).contains(5_000L);
         assertThat(factory.getNetworkReadTimeoutMillis()).contains(10_005L);
-        assertThat(factory.getClientConfig()).hasValueSatisfying(theClientConfig -> {
-            assertThat(theClientConfig.getCacheConfig().getWatchDuration().toSeconds()).isEqualTo(20L);
-        });
+        assertThat(factory.getClientConfig()).hasValueSatisfying(theClientConfig ->
+                assertThat(theClientConfig.getCacheConfig().getWatchDuration().toSeconds()).isEqualTo(20L));
     }
 
     @Test
