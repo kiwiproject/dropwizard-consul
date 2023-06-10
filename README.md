@@ -20,7 +20,7 @@ Introduction
 
 A bundle for using [Consul](https://consul.io) in Dropwizard applications. Features:
 
-* Dropwizard health check that monitors reachablility of Consul
+* Dropwizard health check that monitors reachability of Consul
 * The Dropwizard service is registered as a Consul service with a Consul-side health check querying the
   Dropwizard [health check](https://www.dropwizard.io/en/latest/manual/core.html#health-checks)
 * Ability to resolve [configuration](https://www.dropwizard.io/en/latest/manual/core.html#configuration) properties from
