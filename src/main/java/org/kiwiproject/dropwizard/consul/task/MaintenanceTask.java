@@ -2,8 +2,8 @@ package org.kiwiproject.dropwizard.consul.task;
 
 import static java.util.Objects.requireNonNull;
 
-import com.orbitz.consul.Consul;
 import io.dropwizard.servlets.tasks.Task;
+import org.kiwiproject.consul.Consul;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

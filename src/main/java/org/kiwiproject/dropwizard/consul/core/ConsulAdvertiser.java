@@ -3,12 +3,12 @@ package org.kiwiproject.dropwizard.consul.core;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-import com.orbitz.consul.Consul;
-import com.orbitz.consul.ConsulException;
-import com.orbitz.consul.model.agent.ImmutableRegCheck;
-import com.orbitz.consul.model.agent.ImmutableRegistration;
 import io.dropwizard.setup.Environment;
 import org.apache.commons.net.util.SubnetUtils;
+import org.kiwiproject.consul.Consul;
+import org.kiwiproject.consul.ConsulException;
+import org.kiwiproject.consul.model.agent.ImmutableRegCheck;
+import org.kiwiproject.consul.model.agent.ImmutableRegistration;
 import org.kiwiproject.dropwizard.consul.ConsulFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -9,11 +9,11 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.orbitz.consul.ConsulException;
 import io.dropwizard.util.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.kiwiproject.consul.ConsulException;
 
 import java.util.Optional;
 import java.util.Set;
