@@ -18,6 +18,7 @@ import io.dropwizard.setup.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.kiwiproject.net.LocalPortChecker;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -66,6 +67,8 @@ class ConsulBundleTest {
         @Test
         void shouldNotAllowConsulExceptionToEscape_WhenUnableToConnecttoConsul() {
             var bootstrap = mock(Bootstrap.class);
+            var openPort = new LocalPortChecker().findRandomOpenPort().orElseThrow();
+            doReturn(openPort).when(bundle).getConsulAgentPort();
             assertThatCode(() -> bundle.initialize(bootstrap)).doesNotThrowAnyException();
 
             assertThat(bundle.didAttemptInitialize()).isTrue();
