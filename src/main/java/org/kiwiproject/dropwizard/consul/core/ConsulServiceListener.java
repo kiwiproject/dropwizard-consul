@@ -2,11 +2,11 @@ package org.kiwiproject.dropwizard.consul.core;
 
 import static java.util.Objects.requireNonNull;
 
-import com.orbitz.consul.ConsulException;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.util.Duration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.kiwiproject.consul.ConsulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

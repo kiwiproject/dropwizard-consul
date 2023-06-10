@@ -10,14 +10,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import com.orbitz.consul.config.CacheConfig;
-import com.orbitz.consul.config.ClientConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.kiwiproject.consul.config.CacheConfig;
+import org.kiwiproject.consul.config.ClientConfig;
 import org.kiwiproject.net.LocalPortChecker;
 
 import java.time.Duration;

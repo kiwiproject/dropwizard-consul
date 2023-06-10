@@ -1,8 +1,8 @@
 package org.kiwiproject.dropwizard.consul.config;
 
-import com.orbitz.consul.Consul;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.UndefinedEnvironmentVariableException;
+import org.kiwiproject.consul.Consul;
 
 /**
  * A custom {@link EnvironmentVariableSubstitutor} using Consul KV as lookup source.

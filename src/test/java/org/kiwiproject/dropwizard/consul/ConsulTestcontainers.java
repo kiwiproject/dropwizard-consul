@@ -1,7 +1,6 @@
 package org.kiwiproject.dropwizard.consul;
 
 import com.google.common.net.HostAndPort;
-
 import org.testcontainers.consul.ConsulContainer;
 import org.testcontainers.utility.DockerImageName;
 

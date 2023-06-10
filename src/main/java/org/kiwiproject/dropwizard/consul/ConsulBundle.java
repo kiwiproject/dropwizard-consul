@@ -5,14 +5,14 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
-import com.orbitz.consul.Consul;
-import com.orbitz.consul.ConsulException;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.util.Duration;
+import org.kiwiproject.consul.Consul;
+import org.kiwiproject.consul.ConsulException;
 import org.kiwiproject.dropwizard.consul.config.ConsulSubstitutor;
 import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 import org.kiwiproject.dropwizard.consul.core.ConsulServiceListener;

@@ -3,8 +3,8 @@ package org.kiwiproject.dropwizard.consul.health;
 import static java.util.Objects.requireNonNull;
 
 import com.codahale.metrics.health.HealthCheck;
-import com.orbitz.consul.Consul;
-import com.orbitz.consul.ConsulException;
+import org.kiwiproject.consul.Consul;
+import org.kiwiproject.consul.ConsulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

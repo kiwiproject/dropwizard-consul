@@ -1,9 +1,8 @@
 package org.kiwiproject.dropwizard.consul.managed;
 
-import io.dropwizard.lifecycle.Managed;
-
 import static java.util.Objects.requireNonNull;
 
+import io.dropwizard.lifecycle.Managed;
 import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
 import java.util.Optional;
