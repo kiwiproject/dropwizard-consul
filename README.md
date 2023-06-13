@@ -11,7 +11,7 @@ Dropwizard Consul Bundle
 
 ---
 
-🥝 _This README is a work in progress as we transition dropwizard-consul from smoketurner to kiwiproject._ 🥝
+🥝 _We have now transitioned dropwizard-consul from smoketurner to kiwiproject. It is released to Maven Central._ 🥝
 
 ---
 
