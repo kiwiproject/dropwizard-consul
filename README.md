@@ -188,6 +188,8 @@ to
 import org.kiwiproject.dropwizard.consul.ConsulBundle;
 ```
 
+If existing code directly uses the `consul-client` library (which this bundle depends on), that code will need to be updated starting at version [0.8.0](https://github.com/kiwiproject/dropwizard-consul/releases/tag/v0.8.0), because the base packages were changed from `com.orbitz` to `org.kiwiproject`.
+
 Credits
 -------
 This library comes from the [dropwizard-consul](https://github.com/smoketurner/dropwizard-consul) library from
