@@ -10,9 +10,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -125,7 +125,7 @@ class ConsulBundleTest {
         assertThat(factory.getNetworkWriteTimeoutMillis()).contains(5_000L);
         assertThat(factory.getNetworkReadTimeoutMillis()).contains(10_005L);
         assertThat(factory.getClientConfig()).hasValueSatisfying(theClientConfig ->
-                assertThat(theClientConfig.getCacheConfig().getWatchDuration().toSeconds()).isEqualTo(20L));
+            assertThat(theClientConfig.getCacheConfig().getWatchDuration().toSeconds()).isEqualTo(20L));
     }
 
     @Test

@@ -8,12 +8,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.net.util.SubnetUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.kiwiproject.consul.Consul;
 import org.kiwiproject.consul.config.ClientConfig;
 
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -102,7 +102,7 @@ public class ConsulFactory {
     public void setServiceName(@Nullable String serviceName) {
         this.serviceName = serviceName;
     }
-    
+
     @JsonProperty
     public Optional<Iterable<String>> getTags() {
         return tags;

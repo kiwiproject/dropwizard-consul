@@ -3,7 +3,8 @@ package org.kiwiproject.dropwizard.consul.core;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-import io.dropwizard.setup.Environment;
+import io.dropwizard.core.setup.Environment;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.commons.net.util.SubnetUtils;
 import org.kiwiproject.consul.Consul;
 import org.kiwiproject.consul.ConsulException;
@@ -13,7 +14,6 @@ import org.kiwiproject.dropwizard.consul.ConsulFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.UriBuilder;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
