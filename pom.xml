@@ -34,6 +34,7 @@
         <kiwi-bom.version>2.0.0</kiwi-bom.version>
 
         <!-- Versions for test dependencies -->
+        <kiwi.version>3.0.0</kiwi.version>
         <test-containers.version>1.18.3</test-containers.version>
 
         <!-- Sonar properties -->
@@ -90,7 +91,7 @@
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>kiwi</artifactId>
-            <version>3.0.0</version>
+            <version>${kiwi.version}</version>
             <scope>test</scope>
         </dependency>
 
