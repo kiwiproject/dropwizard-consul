@@ -72,6 +72,11 @@ public class ConsulFactory {
         this.enabled = enabled;
     }
 
+    @JsonIgnore
+    public boolean isDisabled() {
+        return !isEnabled();
+    }
+
     @JsonProperty
     public HostAndPort getEndpoint() {
         return endpoint;

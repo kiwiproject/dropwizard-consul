@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import io.dropwizard.util.Duration;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -59,6 +62,27 @@ class ConsulFactoryTest {
         var serviceName = "test-service";
         consulFactory.setServiceName(serviceName);
         assertThat(consulFactory.getServiceName()).isEqualTo(serviceName);
+    }
+
+    @Test
+    void shouldBeEnabledByDefault() {
+        var consulFactory = new ConsulFactory();
+
+        assertAll(
+                () -> assertThat(consulFactory.isEnabled()).isTrue(),
+                () -> assertThat(consulFactory.isDisabled()).isFalse()
+        );
+    }
+
+    @Test
+    void shouldAllowDisabling() {
+        var consulFactory = new ConsulFactory();
+        consulFactory.setEnabled(false);
+
+        assertAll(
+                () -> assertThat(consulFactory.isEnabled()).isFalse(),
+                () -> assertThat(consulFactory.isDisabled()).isTrue()
+        );
     }
 
     private ConsulFactory createFullyPopulatedConsulFactory() {
