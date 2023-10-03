@@ -35,7 +35,7 @@
 
         <!-- Versions for test dependencies -->
         <kiwi.version>3.0.0</kiwi.version>
-        <test-containers.version>1.19.0</test-containers.version>
+        <test-containers.version>1.19.1</test-containers.version>
 
         <!-- Sonar properties -->
         <sonar.projectKey>kiwiproject_dropwizard-consul</sonar.projectKey>
