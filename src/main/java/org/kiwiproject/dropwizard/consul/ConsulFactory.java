@@ -263,9 +263,9 @@ public class ConsulFactory {
 
         var consulBuilder = Consul.builder().withHostAndPort(endpoint).withPing(servicePing);
 
-        // setting both acl token here and with header, supplying an auth
+        // Setting the acl token here and a header, supplying an auth
         // header. This should cover both use cases: endpoint supports
-        // legacy ?token query param and other case in which endpoint
+        // legacy ?token query param and another case in which endpoint
         // requires an X-Consul-Token header.
         // @see https://www.consul.io/api/index.html#acls
         aclToken.ifPresent(token ->

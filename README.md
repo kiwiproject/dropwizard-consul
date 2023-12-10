@@ -20,7 +20,7 @@ Introduction
 
 A bundle for using [Consul](https://consul.io) in Dropwizard applications. Features:
 
-* Dropwizard health check that monitors reachability of Consul
+* Dropwizard health check that monitors the reachability of Consul
 * The Dropwizard service is registered as a Consul service with a Consul-side health check querying the
   Dropwizard [health check](https://www.dropwizard.io/en/latest/manual/core/#man-core-healthchecks)
 * Ability to resolve [configuration](https://www.dropwizard.io/en/latest/manual/core/#configuration) properties from
@@ -34,7 +34,8 @@ This library was imported from [smoketurner/dropwizard-consul](https://github.co
 is now a [public archive](https://docs.github.com/en/repositories/archiving-a-github-repository/archiving-repositories)
 and is no longer maintained by the original author.
 
-Since we are still using this library in our services which use Dropwizard and Consul, we decided to import the original
+Since we are still using this library in our services, which use Dropwizard and Consul, we decided to import the
+original
 repository and continue maintaining it for our own use, and anyone else who might want to use it. We make no guarantees
 whatsoever about how long we will maintain it, and also plan to make our own changes such as changing the base package
 name to `org.kiwiproject` to be consistent with our other libraries.
@@ -46,7 +47,7 @@ have to gain consent of all contributors, which we do not want to do).
 
 Another thing to note is that we _imported_ this repository from the original, so that it is a "disconnected fork". We
 did not want a reference to the original repository since it is a public archive and no longer maintained. Thus, while
-we maintain the history that this is a fork , it is completely disconnected and is now a standalone (normal) repository.
+we maintain the history that this is a fork, it is completely disconnected and is now a standalone (normal) repository.
 
 Dependency Info
 ---------------
@@ -152,7 +153,7 @@ Migrating from smoketurner/dropwizard-consul
 To migrate an existing project from [smoketurner/dropwizard-consul](https://github.com/smoketurner/dropwizard-consul), you need
 to:
 
-1. Change the group in your build file (i.e. Maven POM, Gradle) from `com.smoketurner.dropwizard` to `org.kiwiproject`
+1. Change the group in your build file (i.e., Maven POM, Gradle) from `com.smoketurner.dropwizard` to `org.kiwiproject`
 2. Change the base package in your code from `com.smoketurner.dropwizard` to `org.kiwiproject.dropwizard`
 
 In a Maven POM, you would change:
@@ -175,7 +176,7 @@ to
 </dependency>
 ```
 
-The class names from the original `smoketurner/dropwizard-consul` library are the same, so for example importing
+The class names from the original `smoketurner/dropwizard-consul` library are the same, so for example, importing
 `ConsulBundle` changes from:
 
 ```java

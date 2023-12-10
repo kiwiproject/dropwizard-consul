@@ -101,9 +101,9 @@ public abstract class ConsulBundle<C extends Configuration>
             getConsulAclToken()
                 .ifPresent(
                     token -> {
-                        // setting both ACL token here and with header, supplying an
+                        // Setting both the ACL token and the header, supplying an
                         // auth header. This should cover both use cases: endpoint
-                        // supports legacy ?token query param and other case
+                        // supports legacy ?token query param and another case
                         // in which endpoint requires an X-Consul-Token header.
                         // @see https://www.consul.io/api/index.html#acls
 
@@ -224,7 +224,7 @@ public abstract class ConsulBundle<C extends Configuration>
      * Note that if {@link #didAttemptInitialize()} returns false, then this method will always
      * return false (it cannot report success if initialization has not been attempted).
      *
-     * @return true if {@link #initialize(Bootstrap)} executed without error, false otherwise
+     * @return true if {@link #initialize(Bootstrap)} executed without an error, false otherwise
      */
     public boolean didInitializeSucceed() {
         return initializeSucceeded.get();

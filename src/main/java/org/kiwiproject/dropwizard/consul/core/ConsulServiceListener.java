@@ -93,9 +93,9 @@ public class ConsulServiceListener implements ServerLifecycleListener {
      * Register ports with Consul and retry if unavailable
      *
      * @param applicationScheme Application protocol scheme
-     * @param applicationPort   Application listening port
-     * @param adminPort         Administration listening port
-     * @param hosts             List of addresses the service is bound to.
+     * @param applicationPort   Application port
+     * @param adminPort         Administration port
+     * @param hosts             the List of addresses the service is bound to.
      */
     void register(String applicationScheme, int applicationPort, int adminPort, Collection<String> hosts) {
         try {
