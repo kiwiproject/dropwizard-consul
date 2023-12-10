@@ -149,7 +149,7 @@ public class ConsulAdvertiser {
      * @param applicationScheme Scheme the server is listening on
      * @param applicationPort   Port the service is listening on
      * @param adminPort         Port the admin server is listening on
-     * @param ipAddresses       IP addresses of the available that the application is listening on
+     * @param ipAddresses       IP addresses that the application is listening on
      * @return true if successfully registered, otherwise false
      * @throws ConsulException When registration fails
      */
@@ -220,7 +220,7 @@ public class ConsulAdvertiser {
      * serviceAddress, if provided, then the subnet resolution, lastly the supplier. If none of the
      * above is provided or matched, Optional.empty() is returned.
      *
-     * @param ipAddresses List of ipAddresses the application is listening on.
+     * @param ipAddresses the List of ipAddresses the application is listening on.
      * @return Optional of the host to register as the service address or empty otherwise
      */
     private Optional<String> getServiceAddress(Collection<String> ipAddresses) {
@@ -247,9 +247,9 @@ public class ConsulAdvertiser {
 
     /**
      * Returns the service address from the list of hosts. It iterates through the list and finds the
-     * first host tht matched the subnet. If none is found, an empty Optional is returned.
+     * first host that matched the subnet. If none is found, an empty Optional is returned.
      *
-     * @param ipAddresses List of ipAddresses the application is listening on.
+     * @param ipAddresses the List of ipAddresses the application is listening on.
      * @return Optional of the host to register as the service address or empty otherwise
      */
     private Optional<String> findFirstEligibleIpBySubnet(Collection<String> ipAddresses) {

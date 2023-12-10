@@ -102,6 +102,7 @@ public class ConsulBundleIntegrationTest {
         assertThat(substitutor).isInstanceOf(ConsulSubstitutor.class);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static Object getFieldValue(Object target, String fieldName) {
         try {
             var field = target.getClass().getDeclaredField(fieldName);
