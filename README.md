@@ -207,8 +207,8 @@ in [GitHub issues](https://github.com/kiwiproject/dropwizard-consul/issues).
 
 License
 -------
-Copyright (c) 2020 Smoke Turner, LLC \
-Copyright (c) 2023 Kiwi Project
+Copyright (c) 2020-2024 Smoke Turner, LLC \
+Copyright (c) 2023-2024 Kiwi Project
 
 This library is licensed under the Apache License, Version 2.0.
 
