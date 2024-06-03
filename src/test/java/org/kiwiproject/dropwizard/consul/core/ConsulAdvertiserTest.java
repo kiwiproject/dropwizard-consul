@@ -249,7 +249,7 @@ class ConsulAdvertiserTest {
         factory.setServiceAddress("127.0.0.1");
 
         when(agent.isRegistered(anyString())).thenReturn(false);
-        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -275,7 +275,7 @@ class ConsulAdvertiserTest {
         factory.setTags(tags);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -301,7 +301,7 @@ class ConsulAdvertiserTest {
         factory.setAclToken(aclToken);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -327,7 +327,7 @@ class ConsulAdvertiserTest {
         factory.setServiceMeta(serviceMeta);
 
         when(agent.isRegistered(serviceId)).thenReturn(false);
-        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -355,7 +355,7 @@ class ConsulAdvertiserTest {
         var configuredHealthCheckUrl = "http://127.0.0.1:8081/admin/ping";
 
         when(agent.isRegistered(anyString())).thenReturn(false);
-        var advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -386,7 +386,6 @@ class ConsulAdvertiserTest {
 
     @Test
     void testDeregister() {
-        var serviceId = advertiser.getServiceId();
         when(agent.isRegistered(serviceId)).thenReturn(true);
         advertiser.deregister();
         verify(agent).deregister(serviceId);
@@ -394,7 +393,6 @@ class ConsulAdvertiserTest {
 
     @Test
     void testDeregisterNotRegistered() {
-        var serviceId = advertiser.getServiceId();
         when(agent.isRegistered(serviceId)).thenReturn(false);
         advertiser.deregister();
         verify(agent, never()).deregister(serviceId);
