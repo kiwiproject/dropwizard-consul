@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -48,32 +47,79 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     @Override
     public void serverStarted(Server server) {
         String applicationScheme = null;
-        int applicationPort = -1;
-        int adminPort = -1;
-        Set<String> hosts = new HashSet<>();
+        var applicationPort = -1;
+        var adminPort = -1;
+        var hosts = new HashSet<String>();
+
+        var applicationConnectorCount = 0;
+        var adminConnectorCount = 0;
+        var otherConnectorCount = 0;
 
         for (var connector : server.getConnectors()) {
+            @SuppressWarnings("resource")
             var serverConnector = (ServerConnector) connector;
+
             hosts.add(serverConnector.getHost());
+
             if (APPLICATION_NAME.equals(connector.getName())) {
                 applicationPort = serverConnector.getLocalPort();
                 applicationScheme = getScheme(connector.getProtocols());
+                ++applicationConnectorCount;
+
             } else if (ADMIN_NAME.equals(connector.getName())) {
                 adminPort = serverConnector.getLocalPort();
+                ++adminConnectorCount;
+
             } else {
                 applicationPort = serverConnector.getLocalPort();
                 applicationScheme = getScheme(connector.getProtocols());
                 adminPort = applicationPort;
+                ++otherConnectorCount;
             }
         }
 
+        logWarningsIfNecessary(server, applicationConnectorCount, adminConnectorCount, otherConnectorCount);
+
         LOG.debug(
-            "applicationScheme: {}, applicationPort: {}, adminPort: {}",
+            "Register with Consul using applicationScheme: {}, applicationPort: {}, adminPort: {}, hosts: {}",
             applicationScheme,
             applicationPort,
-            adminPort);
+            adminPort,
+            hosts);
 
         register(applicationScheme, applicationPort, adminPort, hosts);
+    }
+
+    private void logWarningsIfNecessary(Server server,
+                                        int applicationConnectorCount,
+                                        int adminConnectorCount,
+                                        int otherConnectorCount) {
+
+        if (server.getConnectors().length == 0) {
+            LOG.error("There are NO connectors for the Server!" +
+                      " Consul registration will fail or not work as expected!");
+
+            return;  // the following conditionals cannot be true if we're here
+        }
+
+        if (applicationConnectorCount > 1 ) {
+            LOG.warn("There is more than one application connector." +
+                    " Only the last one's scheme and port will be registered with Consul" +
+                    " unless specified in ConsulFactory configuration!");
+        }
+
+        if (adminConnectorCount > 1) {
+            LOG.warn("There is more than one admin connector." +
+                    " Only the last one's port will be registered with Consul" +
+                    " unless specified in ConsulFactory configuration!");
+        }
+
+        if (otherConnectorCount > 0) {
+            LOG.warn("There is an 'other' connector (not application or admin)." +
+                    " Its port will be used as application and admin port," +
+                    " and its scheme as application scheme" +
+                    " unless specified in ConsulFactory configuration!");
+        }
     }
 
     /**
