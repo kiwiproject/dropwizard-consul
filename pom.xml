@@ -31,7 +31,7 @@
         <!-- Versions for required dependencies -->
         <commons-net.version>3.11.1</commons-net.version>
         <consul-client.version>1.4.1</consul-client.version>
-        <kiwi-bom.version>2.0.15</kiwi-bom.version>
+        <kiwi-bom.version>2.0.17</kiwi-bom.version>
 
         <!-- Versions for test dependencies -->
         <kiwi.version>4.4.0</kiwi.version>
