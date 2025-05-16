@@ -1,7 +1,7 @@
 Dropwizard Consul Bundle
 ========================
 
-[![build](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/build.yml/badge.svg)](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/build.yml)
+[![build](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/build.yml?query=branch%3Amain)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kiwiproject_dropwizard-consul&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=kiwiproject_dropwizard-consul)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=kiwiproject_dropwizard-consul&metric=coverage)](https://sonarcloud.io/summary/new_code?id=kiwiproject_dropwizard-consul)
 [![CodeQL](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/codeql.yml/badge.svg)](https://github.com/kiwiproject/dropwizard-consul/actions/workflows/codeql.yml)
