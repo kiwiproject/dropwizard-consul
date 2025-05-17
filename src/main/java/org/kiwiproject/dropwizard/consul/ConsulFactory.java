@@ -10,7 +10,7 @@ import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.net.util.SubnetUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.kiwiproject.consul.Consul;
 import org.kiwiproject.consul.config.ClientConfig;
 
