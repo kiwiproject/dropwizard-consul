@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import io.dropwizard.configuration.UndefinedEnvironmentVariableException;
 import org.apache.commons.text.lookup.StringLookup;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.kiwiproject.consul.Consul;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
