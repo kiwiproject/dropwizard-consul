@@ -38,7 +38,7 @@ class ConsulBundleTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bundle =
             spy(
                 new ConsulBundle<TestConfiguration>("test") {
