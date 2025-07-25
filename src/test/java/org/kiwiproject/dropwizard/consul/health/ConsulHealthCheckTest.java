@@ -19,7 +19,7 @@ class ConsulHealthCheckTest {
     private final ConsulHealthCheck healthCheck = new ConsulHealthCheck(consul);
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(consul.agentClient()).thenReturn(agent);
     }
 

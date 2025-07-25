@@ -46,7 +46,7 @@ class ConsulAdvertiserTest {
     private String healthCheckUrl;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(consul.agentClient()).thenReturn(agent);
         when(environment.getAdminContext()).thenReturn(handler);
         when(handler.getContextPath()).thenReturn("admin");

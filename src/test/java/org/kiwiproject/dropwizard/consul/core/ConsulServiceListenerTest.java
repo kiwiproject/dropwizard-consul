@@ -34,7 +34,7 @@ class ConsulServiceListenerTest {
     private ScheduledExecutorService scheduler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         advertiser = mock(ConsulAdvertiser.class);
         scheduler = Executors.newScheduledThreadPool(1);
         listener = new ConsulServiceListener(
@@ -42,7 +42,7 @@ class ConsulServiceListenerTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         if (nonNull(scheduler)) {
             scheduler.shutdownNow();
         }
@@ -58,7 +58,7 @@ class ConsulServiceListenerTest {
         private Server server;
 
         @BeforeEach
-        public void setUp() {
+        void setUp() {
             server = mock(Server.class);
         }
 
