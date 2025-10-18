@@ -56,7 +56,6 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         var otherConnectorCount = 0;
 
         for (var connector : server.getConnectors()) {
-            @SuppressWarnings("resource")
             var serverConnector = (ServerConnector) connector;
 
             hosts.add(serverConnector.getHost());
