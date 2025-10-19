@@ -170,7 +170,7 @@ public abstract class ConsulBundle<C extends Configuration>
         environment.healthChecks().register("consul", new ConsulHealthCheck(consul));
 
         // Register a shutdown manager to deregister the service
-        environment.lifecycle().manage(new ConsulAdvertiserManager(advertiser, scheduler));
+        environment.lifecycle().manage(new ConsulAdvertiserManager(advertiser, scheduler.orElse(null)));
 
         // Add an administrative task to toggle maintenance mode
         environment.admin().addTask(new MaintenanceTask(consul, serviceId));
