@@ -1,11 +1,16 @@
 package org.kiwiproject.dropwizard.consul.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.eclipse.jetty.util.StringUtil.isNotBlank;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.util.Duration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.jspecify.annotations.Nullable;
 import org.kiwiproject.consul.ConsulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +22,16 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Dropwizard {@link ServerLifecycleListener} that registers the application
+ * with Consul when the Jetty {@link Server} has started.
+ * <p>
+ * A retry scheduler may be provided to retry Consul registration upon failure.
+ * It will continue trying to register with Consul until registration succeeds,
+ * or the application shuts down. Also note that the retry interval is a fixed
+ * delay, i.e., if the delay is 1 second and Consul is unavailable, registration
+ * will be retried every second, so be careful not to set this too low.
+ */
 public class ConsulServiceListener implements ServerLifecycleListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConsulServiceListener.class);
@@ -25,23 +40,49 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     private static final String ADMIN_NAME = "admin";
 
     private final ConsulAdvertiser advertiser;
-    private final Optional<Duration> retryInterval;
-    private final Optional<ScheduledExecutorService> scheduler;
+    private final Duration retryInterval;
+    private final ScheduledExecutorService scheduler;
 
     /**
-     * Constructor
+     * Create a new instance.
+     * <p>
+     * If the retry {@code scheduler} is provided, it will be automatically shut down
+     * after successful registration with Consul.
      *
      * @param advertiser    Consul advertiser
      * @param retryInterval When specified, will retry if service registration fails
      * @param scheduler     When specified, will retry if service registration fails
+     * @deprecated use {@link #ConsulServiceListener(ConsulAdvertiser, Duration, ScheduledExecutorService)}
      */
+    @SuppressWarnings({ "DeprecatedIsStillUsed", "OptionalUsedAsFieldOrParameterType", "java:S1133" })
+    @Deprecated(since = "1.3.0", forRemoval = true)
     public ConsulServiceListener(ConsulAdvertiser advertiser,
                                  Optional<Duration> retryInterval,
                                  Optional<ScheduledExecutorService> scheduler) {
-
         this.advertiser = requireNonNull(advertiser, "advertiser == null");
-        this.retryInterval = requireNonNull(retryInterval, "retryInterval == null");
-        this.scheduler = requireNonNull(scheduler, "scheduler == null");
+        this.retryInterval = requireNonNull(retryInterval, "retryInterval == null").orElse(null);
+        this.scheduler = requireNonNull(scheduler, "scheduler == null").orElse(null);
+    }
+
+    /**
+     * Create a new instance.
+     * <p>
+     * Note that both {@code retryInterval} and {@code scheduler} must be provided
+     * for retry scheduling of failed registrations.
+     * <p>
+     * If the retry {@code scheduler} is provided, it will be automatically shut down
+     * after successful registration with Consul.
+     *
+     * @param advertiser    Consul advertiser
+     * @param retryInterval The retry interval to use if service registration fails
+     * @param scheduler     The scheduler to use if service registration fails
+     */
+    public ConsulServiceListener(ConsulAdvertiser advertiser,
+                                 @Nullable Duration retryInterval,
+                                 @Nullable ScheduledExecutorService scheduler) {
+        this.advertiser = requireNonNull(advertiser, "advertiser must not be null");
+        this.retryInterval = retryInterval;
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -58,7 +99,10 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         for (var connector : server.getConnectors()) {
             var serverConnector = (ServerConnector) connector;
 
-            hosts.add(serverConnector.getHost());
+            var host = serverConnector.getHost();
+            if (isNotBlank(host)) {
+                hosts.add(host);
+            }
 
             if (APPLICATION_NAME.equals(connector.getName())) {
                 applicationPort = serverConnector.getLocalPort();
@@ -142,21 +186,61 @@ public class ConsulServiceListener implements ServerLifecycleListener {
      * @param adminPort         Administration port
      * @param hosts             the List of addresses the service is bound to.
      */
+    @VisibleForTesting
     void register(String applicationScheme, int applicationPort, int adminPort, Collection<String> hosts) {
         try {
             advertiser.register(applicationScheme, applicationPort, adminPort, hosts);
-            scheduler.ifPresent(ScheduledExecutorService::shutdownNow);
+            if (hasScheduler()) {
+                scheduler.shutdownNow();
+            }
         } catch (ConsulException e) {
             LOG.error("Failed to register service in Consul", e);
 
-            retryInterval.ifPresent(interval ->
-                scheduler.ifPresent(service -> {
-                    LOG.info("Will try to register service again in {} seconds", interval.toSeconds());
-                    service.schedule(
-                        () -> register(applicationScheme, applicationPort, adminPort, hosts),
-                        interval.toSeconds(),
-                        TimeUnit.SECONDS);
-                }));
+            var retryResult = determineRetryDecision();
+            if (retryResult.shouldRetry()) {
+                LOG.info("Will try to register service again in {} ({} ms)", retryInterval, retryResult.retryIntervalMillis());
+                scheduler.schedule(
+                    () -> register(applicationScheme, applicationPort, adminPort, hosts),
+                    retryResult.retryIntervalMillis(),
+                    TimeUnit.MILLISECONDS
+                );
+            } else if (hasScheduler()) {
+                scheduler.shutdownNow();
+            }
         }
+    }
+
+    @VisibleForTesting
+    record RetryResult(boolean shouldRetry, long retryIntervalMillis) {
+        RetryResult {
+            var validInterval = shouldRetry && retryIntervalMillis > 0;
+            checkArgument(validInterval || !shouldRetry, "retryIntervalMillis must be positive when shouldRetry=true");
+        }
+
+        static RetryResult ofIntervalMillis(long retryIntervalMillis) {
+            checkArgument(retryIntervalMillis > 0, "retryIntervalMillis must be positive");
+            return new RetryResult(true, retryIntervalMillis);
+        }
+
+        static RetryResult ofNoRetry() {
+            return new RetryResult(false, -1);
+        }
+    }
+
+    private RetryResult determineRetryDecision() {
+        if (hasScheduler() && nonNull(retryInterval)) {
+            var intervalMillis = retryInterval.toMilliseconds();
+            if (intervalMillis > 0) {
+                return RetryResult.ofIntervalMillis(intervalMillis);
+            } else {
+                LOG.warn("Configured retry interval is non-positive ({} ms); treating as no retry.", intervalMillis);
+            }
+        }
+
+        return RetryResult.ofNoRetry();
+    }
+
+    private boolean hasScheduler() {
+        return nonNull(scheduler);
     }
 }
