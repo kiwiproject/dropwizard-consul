@@ -1,11 +1,16 @@
 package org.kiwiproject.dropwizard.consul.core;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.dropwizard.core.setup.Environment;
 import jakarta.ws.rs.core.UriBuilder;
 import org.apache.commons.net.util.SubnetUtils;
+import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
+import org.jspecify.annotations.Nullable;
 import org.kiwiproject.consul.Consul;
 import org.kiwiproject.consul.ConsulException;
 import org.kiwiproject.consul.model.agent.ImmutableRegCheck;
@@ -17,14 +22,18 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 public class ConsulAdvertiser {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConsulAdvertiser.class);
     private static final String LOCALHOST = "127.0.0.1";
     private static final String DEFAULT_HEALTH_CHECK_PATH = "healthcheck";
+    private static final String IPV4_ADDRESS = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
+    private static final Pattern IPV4_ADDRESS_PATTERN = Pattern.compile(IPV4_ADDRESS);
 
     private final AtomicReference<Integer> servicePort = new AtomicReference<>();
     private final AtomicReference<Integer> serviceAdminPort = new AtomicReference<>();
@@ -139,28 +148,41 @@ public class ConsulAdvertiser {
         return serviceId;
     }
 
-    public boolean register(String applicationScheme, int applicationPort, int adminPort) {
-        return register(applicationScheme, applicationPort, adminPort, null);
-    }
-
     /**
-     * Register the service with Consul
+     * Register the service with Consul.
      *
      * @param applicationScheme Scheme the server is listening on
      * @param applicationPort   Port the service is listening on
      * @param adminPort         Port the admin server is listening on
-     * @param ipAddresses       IP addresses that the application is listening on
-     * @return true if successfully registered, otherwise false
-     * @throws ConsulException When registration fails
+     * @return true if successfully registered, otherwise false (e.g., if already registered)
+     * @throws ConsulException if registration fails
+     */
+    public boolean register(String applicationScheme, int applicationPort, int adminPort) {
+        return register(applicationScheme, applicationPort, adminPort, Set.of());
+    }
+
+    /**
+     * Register the service with Consul.
+     *
+     * @param applicationScheme Scheme the server is listening on
+     * @param applicationPort   Port the service is listening on
+     * @param adminPort         Port the admin server is listening on
+     * @param hosts             Hosts that the application is listening on (can be host name or IP address)
+     * @return true if successfully registered, otherwise false (e.g., if already registered)
+     * @throws ConsulException if registration fails
      */
     public boolean register(String applicationScheme,
                             int applicationPort,
                             int adminPort,
-                            Collection<String> ipAddresses) {
+                            Collection<String> hosts) {
 
         var agentClient = consul.agentClient();
+        var serviceName = configuration.getServiceName();
+        checkState(isNotBlank(serviceName),
+            "serviceName must not be blank; make sure it is set (e.g., in ConsulFactory) before calling register");
+
         if (agentClient.isRegistered(serviceId)) {
-            LOG.info("Service ({}) [{}] already registered", configuration.getServiceName(), serviceId);
+            LOG.info("Service ({}) [{}] already registered", serviceName, serviceId);
             return false;
         }
 
@@ -172,32 +194,30 @@ public class ConsulAdvertiser {
 
         LOG.info(
             "Registering service ({}) [{}] on port {} (admin port {}) with a health check at {} with interval of {}s",
-            configuration.getServiceName(),
+            serviceName,
             serviceId,
             servicePort.get(),
             serviceAdminPort.get(),
             healthCheckPath.get(),
             configuration.getCheckInterval().toSeconds());
 
+        var serviceAddressOpt = getServiceAddress(hosts);
+        var healthCheckUrl = getHealthCheckUrl(applicationScheme, serviceAddressOpt.orElse(null));
         var registrationCheck = ImmutableRegCheck.builder()
-                .http(getHealthCheckUrl(applicationScheme, ipAddresses))
-                .interval(String.format("%ds", configuration.getCheckInterval().toSeconds()))
-                .deregisterCriticalServiceAfter(
-                    String.format("%dm", configuration.getDeregisterInterval().toMinutes()))
-                .build();
+            .http(healthCheckUrl)
+            .interval(String.format("%ds", configuration.getCheckInterval().toSeconds()))
+            .deregisterCriticalServiceAfter(
+                String.format("%dm", configuration.getDeregisterInterval().toMinutes()))
+            .build();
 
         var registrationBuilder = ImmutableRegistration.builder()
-                .port(servicePort.get())
-                .check(registrationCheck)
-                .id(serviceId);
-
-        var serviceName = configuration.getServiceName();
-        if (nonNull(serviceName)) {
-            registrationBuilder.name(serviceName);
-        }
+            .name(serviceName)
+            .port(servicePort.get())
+            .check(registrationCheck)
+            .id(serviceId);
 
         // If we have set the serviceAddress, add it to the registration.
-        getServiceAddress(ipAddresses).ifPresent(registrationBuilder::address);
+        serviceAddressOpt.ifPresent(registrationBuilder::address);
 
         // If we have tags, add them to the registration.
         if (nonNull(tags.get())) {
@@ -219,43 +239,67 @@ public class ConsulAdvertiser {
      * Returns the service address from best provided options. The order of precedence is as follows:
      * serviceAddress, if provided, then the subnet resolution, lastly the supplier. If none of the
      * above is provided or matched, Optional.empty() is returned.
+     * <p>
+     * Note that subnet resolution only takes place for hosts that are IP addresses.
      *
-     * @param ipAddresses the List of ipAddresses the application is listening on.
+     * @param hosts the List of hosts the application is listening on (host names or IPs)
      * @return Optional of the host to register as the service address or empty otherwise
      */
-    private Optional<String> getServiceAddress(Collection<String> ipAddresses) {
-        if (nonNull(serviceAddress.get())) {
-            return Optional.of(serviceAddress.get());
+    @VisibleForTesting
+    Optional<String> getServiceAddress(Collection<String> hosts) {
+        var address = serviceAddress.get();
+        if (nonNull(address)) {
+            return Optional.of(address);
         }
 
-        if (nonNull(ipAddresses) && !ipAddresses.isEmpty() && nonNull(serviceSubnet.get())) {
-            Optional<String> ip = findFirstEligibleIpBySubnet(ipAddresses);
+        var subnet = serviceSubnet.get();
+        if (nonNull(hosts) && !hosts.isEmpty() && nonNull(subnet)) {
+            Optional<String> ip = findFirstEligibleIpBySubnet(hosts, subnet);
             if (ip.isPresent()) {
                 return ip;
             }
         }
 
-        if (nonNull(serviceAddressSupplier.get())) {
+        var addressSupplier = serviceAddressSupplier.get();
+        if (nonNull(addressSupplier)) {
             try {
-                return Optional.ofNullable(serviceAddressSupplier.get().get());
+                return Optional.ofNullable(addressSupplier.get());
             } catch (Exception ex) {
                 LOG.debug("Service address supplier threw an exception.", ex);
             }
         }
+
         return Optional.empty();
     }
 
     /**
      * Returns the service address from the list of hosts. It iterates through the list and finds the
      * first host that matched the subnet. If none is found, an empty Optional is returned.
+     * <p>
+     * Note that this method can return a value when a host is an IP (v4) address.
      *
-     * @param ipAddresses the List of ipAddresses the application is listening on.
+     * @param hosts the List of hosts the application is listening on.
      * @return Optional of the host to register as the service address or empty otherwise
      */
-    private Optional<String> findFirstEligibleIpBySubnet(Collection<String> ipAddresses) {
-        var subnetUtils = new SubnetUtils(serviceSubnet.get());
-        var subNetInfo = subnetUtils.getInfo();
-        return ipAddresses.stream().filter(subNetInfo::isInRange).findFirst();
+    @VisibleForTesting
+    static Optional<String> findFirstEligibleIpBySubnet(Collection<String> hosts, String subnet) {
+        var subnetUtils = new SubnetUtils(subnet);
+        var subnetInfo = subnetUtils.getInfo();
+        return hosts.stream()
+            .filter(IPV4_ADDRESS_PATTERN.asPredicate())
+            .filter(host -> isInRangeSafe(host, subnetInfo))
+            .findFirst();
+    }
+
+    @VisibleForTesting
+    static boolean isInRangeSafe(String host, SubnetInfo subnetInfo) {
+        try {
+            return subnetInfo.isInRange(host);
+        } catch (Exception e) {
+            LOG.debug("Ignoring {} caught on non-IPv4 host '{}': {}",
+                e.getClass().getName(), host, e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -283,17 +327,38 @@ public class ConsulAdvertiser {
     }
 
     /**
-     * Return the health check URL for the service
+     * Return the health check URL for the service.
      *
-     * @param applicationScheme Scheme the server is listening on
+     * @param applicationScheme scheme the server is listening on
      * @param hosts             the hosts to choose from
      * @return health check URL
+     * @deprecated use {@link #getHealthCheckUrl(String, String)} that accepts serviceAddress
      */
+    @SuppressWarnings({ "DeprecatedIsStillUsed", "java:S1133" })
+    @Deprecated(since = "1.3.0", forRemoval = true)
     protected String getHealthCheckUrl(String applicationScheme, Collection<String> hosts) {
+        // Deprecated: intentionally preserved original behavior for binary/source compatibility.
+        // Do not modify without updating tests, release notes, etc.
         var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
             .path(healthCheckPath.get())
             .scheme(applicationScheme)
             .host(getServiceAddress(hosts).orElse(LOCALHOST))
+            .port(serviceAdminPort.get());
+        return uriBuilder.build().toString();
+    }
+
+    /**
+     * Return the health check URL for the service.
+     *
+     * @param applicationScheme scheme the server is listening on
+     * @param serviceAddress    the service address, or null
+     * @return health check URL
+     */
+    protected String getHealthCheckUrl(String applicationScheme, @Nullable String serviceAddress) {
+        var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
+            .path(healthCheckPath.get())
+            .scheme(applicationScheme)
+            .host(isNotBlank(serviceAddress) ? serviceAddress : LOCALHOST)
             .port(serviceAdminPort.get());
         return uriBuilder.build().toString();
     }
