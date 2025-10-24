@@ -327,9 +327,9 @@ public class ConsulAdvertiser {
     }
 
     /**
-     * Return the health check URL for the service
+     * Return the health check URL for the service.
      *
-     * @param applicationScheme Scheme the server is listening on
+     * @param applicationScheme scheme the server is listening on
      * @param hosts             the hosts to choose from
      * @return health check URL
      * @deprecated use {@link #getHealthCheckUrl(String, String)} that accepts serviceAddress
@@ -348,9 +348,9 @@ public class ConsulAdvertiser {
     }
 
     /**
-     * Return the health check URL for the service
+     * Return the health check URL for the service.
      *
-     * @param applicationScheme Scheme the server is listening on
+     * @param applicationScheme scheme the server is listening on
      * @param serviceAddress    the service address, or null
      * @return health check URL
      */
