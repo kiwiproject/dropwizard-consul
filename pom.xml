@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kiwiproject</groupId>
         <artifactId>kiwi-parent</artifactId>
-        <version>3.0.33</version>
+        <version>3.0.34</version>
     </parent>
 
     <artifactId>dropwizard-consul</artifactId>
@@ -29,8 +29,8 @@
 
     <properties>
         <!-- Versions for required dependencies -->
-        <consul-client.version>1.8.0</consul-client.version>
-        <kiwi-bom.version>2.2.0</kiwi-bom.version>
+        <consul-client.version>1.8.1</consul-client.version>
+        <kiwi-bom.version>2.3.0</kiwi-bom.version>
 
         <!-- Versions for test dependencies -->
         <kiwi.version>4.14.0</kiwi.version>
