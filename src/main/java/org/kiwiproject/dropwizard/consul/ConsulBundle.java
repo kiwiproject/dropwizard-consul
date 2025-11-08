@@ -164,7 +164,7 @@ public abstract class ConsulBundle<C extends Configuration>
         environment
             .lifecycle()
             .addServerLifecycleListener(
-                new ConsulServiceListener(advertiser, retryInterval, scheduler));
+                new ConsulServiceListener(advertiser, retryInterval.orElse(null), scheduler.orElse(null)));
 
         // Register a ping healthcheck to the Consul agent
         environment.healthChecks().register("consul", new ConsulHealthCheck(consul));
