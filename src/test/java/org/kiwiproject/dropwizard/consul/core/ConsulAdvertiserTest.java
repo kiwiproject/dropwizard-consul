@@ -610,56 +610,60 @@ class ConsulAdvertiserTest {
         }
     }
 
-    @Test
-    void shouldGetHealthCheckUrl_UsesServiceAddress() {
-        factory.setAdminPort(62999);
-        factory.setHealthCheckPath("health-check");
+    @Nested
+    class GetHealthCheckUrl {
 
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        @Test
+        void shouldUseProvidedServiceAddress() {
+            factory.setAdminPort(62999);
+            factory.setHealthCheckPath("health-check");
 
-        var url = advertiser.getHealthCheckUrl("https", "10.116.42.84");
+            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
 
-        assertThat(url).isEqualTo("https://10.116.42.84:62999/admin/health-check");
-    }
+            var url = advertiser.getHealthCheckUrl("https", "10.116.42.84");
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = { " ", "\t" })
-    void shouldGetHealthCheckUrl_WithoutServiceAddress_FallsBackToLoopbackAddress(String serviceAddress) {
-        factory.setAdminPort(61424);
-        factory.setHealthCheckPath("get-health");
+            assertThat(url).isEqualTo("https://10.116.42.84:62999/admin/health-check");
+        }
 
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = { " ", "\t" })
+        void shouldFallBackToLoopbackAddress_WithoutServiceAddress(String serviceAddress) {
+            factory.setAdminPort(61424);
+            factory.setHealthCheckPath("get-health");
 
-        var url = advertiser.getHealthCheckUrl("https", serviceAddress);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
 
-        assertThat(url).isEqualTo("https://127.0.0.1:61424/admin/get-health");
-    }
+            var url = advertiser.getHealthCheckUrl("https", serviceAddress);
 
-    @SuppressWarnings("removal")
-    @Test
-    void shouldGetHealthCheckUrl_UsingDeprecatedMethod_UsesServiceAddress() {
-        factory.setAdminPort(9999);
-        factory.setHealthCheckPath("health");
-        factory.setServiceAddress("10.116.42.84");
+            assertThat(url).isEqualTo("https://127.0.0.1:61424/admin/get-health");
+        }
 
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        @SuppressWarnings("removal")
+        @Test
+        void shouldUseProvidedServiceAddress_WhenUsingDeprecatedMethod() {
+            factory.setAdminPort(9999);
+            factory.setHealthCheckPath("health");
+            factory.setServiceAddress("10.116.42.84");
 
-        var url = advertiser.getHealthCheckUrl("https", Set.of());
+            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
 
-        assertThat(url).isEqualTo("https://10.116.42.84:9999/admin/health");
-    }
+            var url = advertiser.getHealthCheckUrl("https", Set.of());
 
-    @SuppressWarnings("removal")
-    @Test
-    void shouldGetHealthCheckUrl_UsingDeprecatedMethod_WhenNoServiceAddress_FallsBackToLoopbackAddress() {
-        factory.setAdminPort(9999);
-        factory.setHealthCheckPath("is-healthy");
+            assertThat(url).isEqualTo("https://10.116.42.84:9999/admin/health");
+        }
 
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        @SuppressWarnings("removal")
+        @Test
+        void shouldFallBackToLoopbackAddress_WhenUsingDeprecatedMethod_AndNoServiceAddressIsProvided() {
+            factory.setAdminPort(9999);
+            factory.setHealthCheckPath("is-healthy");
 
-        var url = advertiser.getHealthCheckUrl("https", Set.of());
+            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
 
-        assertThat(url).isEqualTo("https://127.0.0.1:9999/admin/is-healthy");
+            var url = advertiser.getHealthCheckUrl("https", Set.of());
+
+            assertThat(url).isEqualTo("https://127.0.0.1:9999/admin/is-healthy");
+        }
     }
 }
