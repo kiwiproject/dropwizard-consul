@@ -48,6 +48,10 @@ class ConsulServiceListenerTest {
     @BeforeEach
     void setUp() {
         advertiser = mock(ConsulAdvertiser.class);
+
+        // Return a serviceId (mainly so it's not null in log messages during failure tests)
+        when(advertiser.getServiceId()).thenReturn("test-service-" + System.nanoTime());
+
         scheduler = Executors.newScheduledThreadPool(1);
         listener = new ConsulServiceListener(advertiser, Duration.milliseconds(1), scheduler);
     }
