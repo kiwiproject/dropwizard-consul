@@ -209,6 +209,9 @@ public class ConsulServiceListener implements ServerLifecycleListener {
                     TimeUnit.MILLISECONDS
                 );
             } else if (hasScheduler()) {
+                LOG.info("Will not try to register service with ID {} again." +
+                        " Ensure there is a valid retryInterval if you want retry behavior. (retryInterval: {})",
+                    serviceId, retryInterval);
                 scheduler.shutdownNow();
             }
         }
