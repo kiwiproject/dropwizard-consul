@@ -194,11 +194,13 @@ public class ConsulServiceListener implements ServerLifecycleListener {
                 scheduler.shutdownNow();
             }
         } catch (ConsulException e) {
-            LOG.error("Failed to register service in Consul", e);
+            var serviceId = advertiser.getServiceId();
+            LOG.error("Failed to register service with ID {} in Consul", serviceId, e);
 
             var retryResult = determineRetryDecision();
             if (retryResult.shouldRetry()) {
-                LOG.info("Will try to register service again in {} ({} ms)", retryInterval, retryResult.retryIntervalMillis());
+                LOG.info("Will try to register service with ID {} again in {} ({} ms)",
+                    serviceId, retryInterval, retryResult.retryIntervalMillis());
                 scheduler.schedule(
                     () -> register(applicationScheme, applicationPort, adminPort, hosts),
                     retryResult.retryIntervalMillis(),
