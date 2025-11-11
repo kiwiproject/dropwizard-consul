@@ -3,7 +3,7 @@ package org.kiwiproject.dropwizard.consul.core;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.eclipse.jetty.util.StringUtil.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
