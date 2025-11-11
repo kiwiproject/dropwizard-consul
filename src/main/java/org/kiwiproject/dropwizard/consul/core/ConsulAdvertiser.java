@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.consul.core;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -32,6 +33,9 @@ public class ConsulAdvertiser {
     private static final Logger LOG = LoggerFactory.getLogger(ConsulAdvertiser.class);
     private static final String LOCALHOST = "127.0.0.1";
     private static final String DEFAULT_HEALTH_CHECK_PATH = "healthcheck";
+
+    // Matches four dot-separated numeric groups (e.g., 192.168.0.1), intended as a quick
+    // format check, not full IPv4 validation.
     private static final String IPV4_ADDRESS = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
     private static final Pattern IPV4_ADDRESS_PATTERN = Pattern.compile(IPV4_ADDRESS);
 
@@ -176,11 +180,11 @@ public class ConsulAdvertiser {
                             int adminPort,
                             Collection<String> hosts) {
 
-        var agentClient = consul.agentClient();
         var serviceName = configuration.getServiceName();
         checkState(isNotBlank(serviceName),
             "serviceName must not be blank; make sure it is set (e.g., in ConsulFactory) before calling register");
 
+        var agentClient = consul.agentClient();
         if (agentClient.isRegistered(serviceId)) {
             LOG.info("Service ({}) [{}] already registered", serviceName, serviceId);
             return false;
@@ -192,17 +196,22 @@ public class ConsulAdvertiser {
         serviceAdminPort.compareAndSet(null, adminPort);
         healthCheckPath.compareAndSet(null, DEFAULT_HEALTH_CHECK_PATH);
 
+        var serviceAddressOpt = getServiceAddress(hosts);
+        var serviceAddressOrNull = serviceAddressOpt.orElse(null);
+        var healthCheckUrl = getHealthCheckUrl(applicationScheme, serviceAddressOrNull);
+
         LOG.info(
-            "Registering service ({}) [{}] on port {} (admin port {}) with a health check at {} with interval of {}s",
+            "Registering service {} [id: {}] with address {} on port {}" +
+                " (admin port {}) with health check path '{}' (URL: {}) and interval of {}s",
             serviceName,
             serviceId,
+            isNull(serviceAddressOrNull) ? "[agent-default]" : serviceAddressOrNull,
             servicePort.get(),
             serviceAdminPort.get(),
             healthCheckPath.get(),
+            healthCheckUrl,
             configuration.getCheckInterval().toSeconds());
 
-        var serviceAddressOpt = getServiceAddress(hosts);
-        var healthCheckUrl = getHealthCheckUrl(applicationScheme, serviceAddressOpt.orElse(null));
         var registrationCheck = ImmutableRegCheck.builder()
             .http(healthCheckUrl)
             .interval(String.format("%ds", configuration.getCheckInterval().toSeconds()))
