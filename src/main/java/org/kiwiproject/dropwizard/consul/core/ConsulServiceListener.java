@@ -15,6 +15,7 @@ import org.kiwiproject.consul.ConsulException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -92,36 +93,45 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         var adminPort = -1;
         var hosts = new HashSet<String>();
 
+        var connectors = server.getConnectors();
+        var serverConnectors = Arrays.stream(connectors)
+            .filter(ServerConnector.class::isInstance)
+            .map(ServerConnector.class::cast)
+            .toList();
+
         var applicationConnectorCount = 0;
         var adminConnectorCount = 0;
         var otherConnectorCount = 0;
 
-        for (var connector : server.getConnectors()) {
-            var serverConnector = (ServerConnector) connector;
-
+        for (var serverConnector : serverConnectors) {
             var host = serverConnector.getHost();
             if (isNotBlank(host)) {
                 hosts.add(host);
             }
 
-            if (APPLICATION_NAME.equals(connector.getName())) {
+            if (APPLICATION_NAME.equals(serverConnector.getName())) {
                 applicationPort = serverConnector.getLocalPort();
-                applicationScheme = getScheme(connector.getProtocols());
+                applicationScheme = getScheme(serverConnector.getProtocols());
                 ++applicationConnectorCount;
 
-            } else if (ADMIN_NAME.equals(connector.getName())) {
+            } else if (ADMIN_NAME.equals(serverConnector.getName())) {
                 adminPort = serverConnector.getLocalPort();
                 ++adminConnectorCount;
 
             } else {
                 applicationPort = serverConnector.getLocalPort();
-                applicationScheme = getScheme(connector.getProtocols());
+                applicationScheme = getScheme(serverConnector.getProtocols());
                 adminPort = applicationPort;
                 ++otherConnectorCount;
             }
         }
 
-        logWarningsIfNecessary(server, applicationConnectorCount, adminConnectorCount, otherConnectorCount);
+        logWarningsIfNecessary(
+            connectors.length,
+            serverConnectors.size(),
+            applicationConnectorCount,
+            adminConnectorCount,
+            otherConnectorCount);
 
         LOG.debug(
             "Register with Consul using applicationScheme: {}, applicationPort: {}, adminPort: {}, hosts: {}",
@@ -133,14 +143,22 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         register(applicationScheme, applicationPort, adminPort, hosts);
     }
 
-    private void logWarningsIfNecessary(Server server,
+    private void logWarningsIfNecessary(int connectorCount,
+                                        int serverConnectorCount,
                                         int applicationConnectorCount,
                                         int adminConnectorCount,
                                         int otherConnectorCount) {
 
-        if (server.getConnectors().length == 0) {
+        if (connectorCount == 0) {
             LOG.error("There are NO connectors for the Server!" +
-                      " Consul registration will fail or not work as expected!");
+                " Consul registration will fail or not work as expected!");
+
+            return;  // the following conditionals cannot be true if we're here
+        }
+
+        if (serverConnectorCount == 0) {
+            LOG.error("There are NO connectors of type ServerConnector for the Server!" +
+                " Consul registration will fail or not work as expected!");
 
             return;  // the following conditionals cannot be true if we're here
         }

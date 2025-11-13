@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import io.dropwizard.util.Duration;
 import org.awaitility.Durations;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.LocalConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.jspecify.annotations.Nullable;
@@ -78,8 +79,16 @@ class ConsulServiceListenerTest {
         }
 
         @Test
-        void shouldDoNothing_ForDegenerateCase_WhenThereAreNoServerConnectors() {
+        void shouldDoNothing_ForDegenerateCase_WhenThereAreNoConnectors() {
             when(server.getConnectors()).thenReturn(new Connector[0]);
+
+            verifyRegistration(null, -1, -1);
+        }
+
+        @Test
+        void shouldDoNothing_ForDegenerateCase_WhenThereAreNoServerConnectors() {
+            var localConnector = mock(LocalConnector.class);
+            when(server.getConnectors()).thenReturn(new Connector[] { localConnector });
 
             verifyRegistration(null, -1, -1);
         }
@@ -173,6 +182,30 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(new Connector[] { connector });
 
             verifyRegistration("http", 8042, 8042, "simple.acme.com");
+        }
+
+        @Test
+        void shouldRegister_UsingServerConnectors_WhenThereAreOtherConnectorTypes() {
+            var applicationConnector = mockServerConnector(
+                "application", "server.acme.com", 9042, "http/1.1");
+
+            var adminConnector = mockServerConnector(
+                "admin", "server.acme.com", 9043, "http/1.1");
+
+            var localConnector1 = mockLocalConnector("local-1");
+            var localConnector2 = mockLocalConnector("local-2");
+            var localConnector3 = mockLocalConnector("local-3");
+
+            when(server.getConnectors()).thenReturn(
+                new Connector[] { localConnector1, applicationConnector, localConnector2, adminConnector, localConnector3 });
+
+            verifyRegistration("http", 9042, 9043, "server.acme.com");
+        }
+
+        private static LocalConnector mockLocalConnector(String name) {
+            var connector = mock(LocalConnector.class);
+            when(connector.getName()).thenReturn(name);
+            return connector;
         }
 
         @Test
