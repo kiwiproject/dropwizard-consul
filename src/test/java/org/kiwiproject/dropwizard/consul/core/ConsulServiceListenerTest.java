@@ -185,6 +185,30 @@ class ConsulServiceListenerTest {
         }
 
         @Test
+        void shouldRegister_UsingServerConnectors_WhenThereAreOtherConnectorTypes() {
+            var applicationConnector = mockServerConnector(
+                "application", "server.acme.com", 9042, "http/1.1");
+
+            var adminConnector = mockServerConnector(
+                "admin", "server.acme.com", 9043, "http/1.1");
+
+            var localConnector1 = mockLocalConnector("local-1");
+            var localConnector2 = mockLocalConnector("local-2");
+            var localConnector3 = mockLocalConnector("local-3");
+
+            when(server.getConnectors()).thenReturn(
+                new Connector[] { localConnector1, applicationConnector, localConnector2, adminConnector, localConnector3 });
+
+            verifyRegistration("http", 9042, 9043, "server.acme.com");
+        }
+
+        private static LocalConnector mockLocalConnector(String name) {
+            var connector = mock(LocalConnector.class);
+            when(connector.getName()).thenReturn(name);
+            return connector;
+        }
+
+        @Test
         void shouldRegister_WithLastConnectorWinning_WhenMultipleOtherConnectors() {
             var connector1 = mockServerConnector("connector-1", "simple.acme.com", 7042, "http/1.1", "ssl");
             var connector2 = mockServerConnector("connector-2", "simple.acme.com", 7142, "http/1.1");
