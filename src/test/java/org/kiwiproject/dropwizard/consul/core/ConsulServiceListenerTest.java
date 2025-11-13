@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import io.dropwizard.util.Duration;
 import org.awaitility.Durations;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.LocalConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.jspecify.annotations.Nullable;
@@ -78,8 +79,16 @@ class ConsulServiceListenerTest {
         }
 
         @Test
-        void shouldDoNothing_ForDegenerateCase_WhenThereAreNoServerConnectors() {
+        void shouldDoNothing_ForDegenerateCase_WhenThereAreNoConnectors() {
             when(server.getConnectors()).thenReturn(new Connector[0]);
+
+            verifyRegistration(null, -1, -1);
+        }
+
+        @Test
+        void shouldDoNothing_ForDegenerateCase_WhenThereAreNoServerConnectors() {
+            var localConnector = mock(LocalConnector.class);
+            when(server.getConnectors()).thenReturn(new Connector[] { localConnector });
 
             verifyRegistration(null, -1, -1);
         }
