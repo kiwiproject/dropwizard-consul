@@ -171,14 +171,15 @@ public class ConsulAdvertiser {
      * @param applicationScheme Scheme the server is listening on
      * @param applicationPort   Port the service is listening on
      * @param adminPort         Port the admin server is listening on
-     * @param hosts             Hosts that the application is listening on (can be host name or IP address)
+     * @param hosts             Hosts that the application is listening on (can be host name or IP address);
+     *                          may be null
      * @return true if successfully registered, otherwise false (e.g., if already registered)
      * @throws ConsulException if registration fails
      */
     public boolean register(String applicationScheme,
                             int applicationPort,
                             int adminPort,
-                            Collection<String> hosts) {
+                            @Nullable Collection<String> hosts) {
 
         var serviceName = configuration.getServiceName();
         checkState(isNotBlank(serviceName),
@@ -251,11 +252,11 @@ public class ConsulAdvertiser {
      * <p>
      * Note that subnet resolution only takes place for hosts that are IP addresses.
      *
-     * @param hosts the List of hosts the application is listening on (host names or IPs)
+     * @param hosts the List of hosts the application is listening on (host names or IPs); may be null
      * @return Optional of the host to register as the service address or empty otherwise
      */
     @VisibleForTesting
-    Optional<String> getServiceAddress(Collection<String> hosts) {
+    Optional<String> getServiceAddress(@Nullable Collection<String> hosts) {
         var address = serviceAddress.get();
         if (nonNull(address)) {
             return Optional.of(address);
