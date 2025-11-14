@@ -19,9 +19,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * Dropwizard {@link ServerLifecycleListener} that registers the application
@@ -126,12 +128,14 @@ public class ConsulServiceListener implements ServerLifecycleListener {
             }
         }
 
-        logWarningsIfNecessary(
-            connectors.length,
-            serverConnectors.size(),
-            applicationConnectorCount,
-            adminConnectorCount,
-            otherConnectorCount);
+        logWarningsIfNecessary(applicationConnectorCount, adminConnectorCount, otherConnectorCount);
+
+        var missingPorts = getMissingPorts(applicationPort, adminPort);
+
+        if (!missingPorts.isEmpty()) {
+            logMissingPortError(missingPorts);
+            return;
+        }
 
         LOG.debug(
             "Register with Consul using applicationScheme: {}, applicationPort: {}, adminPort: {}, hosts: {}",
@@ -143,25 +147,9 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         register(applicationScheme, applicationPort, adminPort, hosts);
     }
 
-    private void logWarningsIfNecessary(int connectorCount,
-                                        int serverConnectorCount,
-                                        int applicationConnectorCount,
+    private void logWarningsIfNecessary(int applicationConnectorCount,
                                         int adminConnectorCount,
                                         int otherConnectorCount) {
-
-        if (connectorCount == 0) {
-            LOG.error("There are NO connectors for the Server!" +
-                " Consul registration will fail or not work as expected!");
-
-            return;  // the following conditionals cannot be true if we're here
-        }
-
-        if (serverConnectorCount == 0) {
-            LOG.error("There are NO connectors of type ServerConnector for the Server!" +
-                " Consul registration will fail or not work as expected!");
-
-            return;  // the following conditionals cannot be true if we're here
-        }
 
         if (applicationConnectorCount > 1 ) {
             LOG.warn("There is more than one application connector." +
@@ -181,6 +169,29 @@ public class ConsulServiceListener implements ServerLifecycleListener {
                     " and its scheme as application scheme" +
                     " unless specified in ConsulFactory configuration!");
         }
+    }
+
+    private static List<String> getMissingPorts(int applicationPort, int adminPort) {
+        return Stream.of(
+                missingPortOrNull(APPLICATION_NAME, applicationPort),
+                missingPortOrNull(ADMIN_NAME, adminPort)
+            )
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    private static String missingPortOrNull(String name, int port) {
+        return port == -1 ? name : null;
+    }
+
+    private static void logMissingPortError(List<String> missingPorts) {
+        var joined = String.join(" and ", missingPorts);
+        var plural = missingPorts.size() > 1 ? "s" : "";
+        LOG.error(
+            "Did not find {} port{}, so Consul registration cannot continue and will be skipped." +
+                " Check your configuration to make sure Jetty connectors are configured correctly.",
+            joined, plural
+        );
     }
 
     /**
