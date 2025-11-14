@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,7 +83,9 @@ class ConsulServiceListenerTest {
         void shouldDoNothing_ForDegenerateCase_WhenThereAreNoConnectors() {
             when(server.getConnectors()).thenReturn(new Connector[0]);
 
-            verifyRegistration(null, -1, -1);
+            listener.serverStarted(server);
+
+            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
         }
 
         @Test
@@ -90,7 +93,33 @@ class ConsulServiceListenerTest {
             var localConnector = mock(LocalConnector.class);
             when(server.getConnectors()).thenReturn(new Connector[] { localConnector });
 
-            verifyRegistration(null, -1, -1);
+            listener.serverStarted(server);
+
+            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
+        }
+
+        @Test
+        void shouldDoNothing_WhenOnlyApplicationConnector() {
+            var applicationConnector = mockServerConnector(
+                "application", "server.acme.com", 9042, "http/1.1");
+
+            when(server.getConnectors()).thenReturn(new Connector[] { applicationConnector });
+
+            listener.serverStarted(server);
+
+            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
+        }
+
+        @Test
+        void shouldDoNothing_WhenOnlyAdminConnector() {
+            var adminConnector = mockServerConnector(
+                "admin", "server.acme.com", 9043, "http/1.1");
+
+            when(server.getConnectors()).thenReturn(new Connector[] { adminConnector });
+
+            listener.serverStarted(server);
+
+            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
         }
 
         @Test
