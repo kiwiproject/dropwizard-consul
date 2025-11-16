@@ -343,6 +343,7 @@ public class ConsulAdvertiser {
      * @param hosts             the hosts to choose from
      * @return health check URL
      * @deprecated use {@link #getHealthCheckUrl(String, String)} that accepts serviceAddress
+     * @apiNote This method is no longer used, so overriding it will have no effect.
      */
     @SuppressWarnings({ "DeprecatedIsStillUsed", "java:S1133" })
     @Deprecated(since = "1.3.0", forRemoval = true)
@@ -363,6 +364,16 @@ public class ConsulAdvertiser {
      * @param applicationScheme scheme the server is listening on
      * @param serviceAddress    the service address, or null
      * @return health check URL
+     * @apiNote This method is called by this class in {@link #register(String, int, int, Collection)}.
+     * Overriding it in a subclass will therefore <strong>have no effect</strong> if you are using
+     * {@link org.kiwiproject.dropwizard.consul.ConsulBundle ConsulBundle} for registration, since at present
+     * there is no way to tell {@code ConsulBundle} to use a specific {@link ConsulAdvertiser} subclass.
+     * In a future release, we may address this differently, for example, by providing a pluggable
+     * mechanism to build the health check URL. If you must change the way the health check URL
+     * is built, the only option currently is to subclass this class, and not use {@code ConsulBundle}
+     * but rather create your own bundle. One way would be to copy {@code ConsulBundle}, modify the
+     * code to instantiate the custom {@link ConsulAdvertiser} subclass, and then add the custom
+     * bundle to your {@link io.dropwizard.core.Application Application}.
      */
     protected String getHealthCheckUrl(String applicationScheme, @Nullable String serviceAddress) {
         var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
