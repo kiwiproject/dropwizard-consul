@@ -85,6 +85,15 @@ class ConsulFactoryTest {
         );
     }
 
+    @Test
+    void shouldAllowSkipTlsVerificationOnHealthCheck() {
+        var consulFactory = new ConsulFactory();
+        assertThat(consulFactory.getHealthCheckSkipTlsVerify()).isEmpty();
+
+        consulFactory.setHealthCheckSkipTlsVerify(true);
+        assertThat(consulFactory.getHealthCheckSkipTlsVerify()).contains(true);
+    }
+
     private ConsulFactory createFullyPopulatedConsulFactory() {
         var consulFactory = new ConsulFactory();
         consulFactory.setServiceName("serviceName");

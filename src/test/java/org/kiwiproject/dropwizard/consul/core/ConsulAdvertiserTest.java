@@ -594,6 +594,31 @@ class ConsulAdvertiserTest {
         }
     }
 
+    @Test
+    void testRegisterWithSkipTlsVerifyOnHealthCheck() {
+        factory.setHealthCheckSkipTlsVerify(true);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+
+        when(agent.isRegistered(serviceId)).thenReturn(false);
+        registerAndEnsureRegistered(advertiser);
+
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .tlsSkipVerify(true)
+                    .build())
+             .name("test")
+            .meta(Map.of("scheme", "http"))
+            .id(serviceId)
+            .build();
+
+        verify(agent).register(registration);
+    }
+
     @Nested
     class InternalIsInRangeSafe {
 

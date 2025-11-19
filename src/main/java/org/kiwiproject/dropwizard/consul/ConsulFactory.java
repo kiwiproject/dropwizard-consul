@@ -56,6 +56,8 @@ public class ConsulFactory {
 
     private Optional<String> healthCheckPath = Optional.empty();
 
+    private Boolean healthCheckSkipTlsVerify;
+
     private Optional<Long> networkWriteTimeoutMillis = Optional.empty();
 
     private Optional<Long> networkReadTimeoutMillis = Optional.empty();
@@ -232,6 +234,14 @@ public class ConsulFactory {
 
     public void setHealthCheckPath(String healthCheckPath) {
         this.healthCheckPath = Optional.ofNullable(healthCheckPath);
+    }
+
+    public Optional<Boolean> getHealthCheckSkipTlsVerify() {
+        return Optional.ofNullable(healthCheckSkipTlsVerify);
+    }
+
+    public void setHealthCheckSkipTlsVerify(Boolean tlsSkipVerify) {
+        this.healthCheckSkipTlsVerify = tlsSkipVerify;
     }
 
     public Optional<Long> getNetworkWriteTimeoutMillis() {

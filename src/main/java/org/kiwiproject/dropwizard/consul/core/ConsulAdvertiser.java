@@ -52,6 +52,7 @@ public class ConsulAdvertiser {
     private final Consul consul;
     private final String serviceId;
     private final AtomicReference<String> healthCheckPath = new AtomicReference<>();
+    private final AtomicReference<Boolean> healthCheckSkipTlsVerify = new AtomicReference<>();
 
     /**
      * Constructor
@@ -141,6 +142,14 @@ public class ConsulAdvertiser {
                         newHealthCheckPath);
                     healthCheckPath.set(newHealthCheckPath);
                 });
+
+        configuration
+            .getHealthCheckSkipTlsVerify()
+            .ifPresent(newHealthCheckSkipTlsVerify -> {
+                LOG.info("Using \"{}\" as value for tls_skip_verify in registration health check",
+                    newHealthCheckSkipTlsVerify);
+                healthCheckSkipTlsVerify.set(newHealthCheckSkipTlsVerify);
+            });
     }
 
     /**
@@ -215,6 +224,7 @@ public class ConsulAdvertiser {
 
         var registrationCheck = ImmutableRegCheck.builder()
             .http(healthCheckUrl)
+            .tlsSkipVerify(Optional.ofNullable(healthCheckSkipTlsVerify.get()))
             .interval(String.format("%ds", configuration.getCheckInterval().toSeconds()))
             .deregisterCriticalServiceAfter(
                 String.format("%dm", configuration.getDeregisterInterval().toMinutes()))
