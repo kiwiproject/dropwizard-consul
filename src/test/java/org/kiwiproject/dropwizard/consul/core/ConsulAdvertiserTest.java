@@ -2,6 +2,7 @@ package org.kiwiproject.dropwizard.consul.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.kiwiproject.base.KiwiStrings.f;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,10 +23,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.collect.KiwiLists;
+import org.kiwiproject.collect.KiwiMaps;
 import org.kiwiproject.consul.AgentClient;
 import org.kiwiproject.consul.Consul;
 import org.kiwiproject.consul.ConsulException;
@@ -103,6 +106,37 @@ class ConsulAdvertiserTest {
                     .build())
             .name(SERVICE_NAME)
             .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
+            .build();
+
+        verify(agent).register(registration);
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            http, 5050, http, 5051
+            http, 6060, https, 6061
+            https, 7070, http, 7071
+            https, 8080, https, 8081
+            """)
+    void shouldRegisterWithDifferentPortsAndSchemes(String applicationScheme, int applicationPort, String adminScheme, int adminPort) {
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
+
+        var didRegister = advertiser.register(applicationScheme, applicationPort, adminScheme, adminPort);
+        assertThat(didRegister).isTrue();
+
+        var healthCheckUrlWithCorrectScheme = f("{}://127.0.0.1:{}/admin/{}", adminScheme, adminPort, DEFAULT_HEALTH_CHECK_PATH);
+
+        var registration = ImmutableRegistration.builder()
+            .port(applicationPort)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrlWithCorrectScheme)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .build())
+            .name(SERVICE_NAME)
+            .meta(standardMetaForSchemes(applicationScheme, adminScheme))
             .id(SERVICE_ID)
             .build();
 
@@ -401,7 +435,7 @@ class ConsulAdvertiserTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void testRegisterWithSkipTlsVerifyOnHealthCheck(boolean tlsSkipVerify) {
+    void shouldRegisterWithSkipTlsVerifyOnHealthCheck(boolean tlsSkipVerify) {
         factory.setHealthCheckSkipTlsVerify(tlsSkipVerify);
         advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
@@ -430,10 +464,18 @@ class ConsulAdvertiserTest {
     }
 
     private static Map<String, String> standardMetaForScheme(String scheme) {
-        return Map.of(
+        return KiwiMaps.newLinkedHashMap(
             "scheme", scheme,
             "applicationScheme", scheme,
             "adminScheme", scheme
+        );
+    }
+
+    private static Map<String, String> standardMetaForSchemes(String applicationScheme, String adminScheme) {
+        return KiwiMaps.newLinkedHashMap(
+            "scheme", applicationScheme,
+            "applicationScheme", applicationScheme,
+            "adminScheme", adminScheme
         );
     }
 
