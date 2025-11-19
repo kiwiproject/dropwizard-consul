@@ -91,6 +91,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     @Override
     public void serverStarted(Server server) {
         String applicationScheme = null;
+        String adminScheme = null;
         var applicationPort = -1;
         var adminPort = -1;
         var hosts = new HashSet<String>();
@@ -113,16 +114,18 @@ public class ConsulServiceListener implements ServerLifecycleListener {
 
             if (APPLICATION_NAME.equals(serverConnector.getName())) {
                 applicationPort = serverConnector.getLocalPort();
-                applicationScheme = getScheme(serverConnector.getProtocols());
+                applicationScheme = getScheme(serverConnector);
                 ++applicationConnectorCount;
 
             } else if (ADMIN_NAME.equals(serverConnector.getName())) {
                 adminPort = serverConnector.getLocalPort();
+                adminScheme = getScheme(serverConnector);
                 ++adminConnectorCount;
 
             } else {
                 applicationPort = serverConnector.getLocalPort();
-                applicationScheme = getScheme(serverConnector.getProtocols());
+                applicationScheme = getScheme(serverConnector);
+                adminScheme = applicationScheme;
                 adminPort = applicationPort;
                 ++otherConnectorCount;
             }
@@ -144,7 +147,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
             adminPort,
             hosts);
 
-        register(applicationScheme, applicationPort, adminPort, hosts);
+        register(applicationScheme, applicationPort, adminScheme, adminPort, hosts);
     }
 
     private void logWarningsIfNecessary(int applicationConnectorCount,
@@ -166,7 +169,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
         if (otherConnectorCount > 0) {
             LOG.warn("There is an 'other' connector (not application or admin)." +
                     " Its port will be used as application and admin port," +
-                    " and its scheme as application scheme" +
+                    " and its scheme as the application and admin scheme" +
                     " unless specified in ConsulFactory configuration!");
         }
     }
@@ -197,10 +200,13 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     /**
      * Return the protocol scheme from a list of protocols.
      *
-     * @param protocols Configured protocols
+     * @param serverConnector the server connector
      * @return protocol scheme
      */
-    private static String getScheme(List<String> protocols) {
+    private static String getScheme(ServerConnector serverConnector) {
+        var protocols = serverConnector.getProtocols();
+        LOG.info("ServerConnector '{}' has protocols: {}", serverConnector.getName(), protocols);
+
         if (protocols.contains("ssl")) {
             return "https";
         }
@@ -216,9 +222,9 @@ public class ConsulServiceListener implements ServerLifecycleListener {
      * @param hosts             the List of addresses the service is bound to.
      */
     @VisibleForTesting
-    void register(String applicationScheme, int applicationPort, int adminPort, Collection<String> hosts) {
+    void register(String applicationScheme, int applicationPort, String adminScheme, int adminPort, Collection<String> hosts) {
         try {
-            advertiser.register(applicationScheme, applicationPort, adminPort, hosts);
+            advertiser.register(applicationScheme, applicationPort, adminScheme, adminPort, hosts);
             if (hasScheduler()) {
                 scheduler.shutdownNow();
             }
@@ -233,7 +239,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
                 LOG.info("Will try to register service with ID {} (scheme: {}, hosts: {}, port:{}, admin port: {}) again in {} ({} ms)",
                     serviceId, applicationScheme, hosts, applicationPort, adminPort, retryInterval, retryIntervalMillis);
                 scheduler.schedule(
-                    () -> register(applicationScheme, applicationPort, adminPort, hosts),
+                    () -> register(applicationScheme, applicationPort, adminScheme, adminPort, hosts),
                     retryIntervalMillis,
                     TimeUnit.MILLISECONDS
                 );

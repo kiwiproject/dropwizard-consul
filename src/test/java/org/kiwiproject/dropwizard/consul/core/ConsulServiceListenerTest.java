@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -133,7 +132,7 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(
                 new Connector[] {applicationConnector, adminConnector});
 
-            verifyRegistration("http", 9042, 9043, "server.acme.com");
+            verifyRegistration("http", 9042, "http", 9043, "server.acme.com");
         }
 
         @Test
@@ -147,7 +146,7 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(
                 new Connector[] {applicationConnector, adminConnector});
 
-            verifyRegistration("https", 9042, 9043, "server.acme.com");
+            verifyRegistration("https", 9042, "https", 9043, "server.acme.com");
         }
 
         @Test
@@ -164,11 +163,11 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(
                     new Connector[] {applicationConnector1, applicationConnector2, adminConnector});
 
-            verifyRegistration("http", 9084, 9043, "server.acme.com");
+            verifyRegistration("http", 9084, "https", 9043, "server.acme.com");
         }
 
         @Test
-        void shouldRegister_WithLastAdminPortWinning_AndApplicationSchemeWinning_WhenMultipleAdminConnectors() {
+        void shouldRegister_WithLastAdminPortAndSchemeWinning_WhenMultipleAdminConnectors() {
             var applicationConnector = mockServerConnector(
                 "application", "server.acme.com", 9042, "http/1.1", "ssl");
 
@@ -181,11 +180,11 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(
                     new Connector[] {applicationConnector, adminConnector1, adminConnector2});
 
-            verifyRegistration("https", 9042, 9143, "server.acme.com");
+            verifyRegistration("https", 9042, "http", 9143, "server.acme.com");
         }
 
         @Test
-        void shouldRegister_WithLastPortWinning_AndLastApplicationSchemeWinning_WhenMultipleConnectors() {
+        void shouldRegister_WithLastPortWinning_AndLastSchemeWinning_WhenMultipleConnectors() {
             var applicationConnector1 = mockServerConnector(
                 "application", "server.acme.com", 9042, "http/1.1", "ssl");
 
@@ -201,7 +200,7 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(
                     new Connector[] {applicationConnector1, applicationConnector2, adminConnector1, adminConnector2});
 
-            verifyRegistration("http", 9142, 9143, "server.acme.com");
+            verifyRegistration("http", 9142, "http", 9143, "server.acme.com");
         }
 
         @Test
@@ -210,7 +209,7 @@ class ConsulServiceListenerTest {
 
             when(server.getConnectors()).thenReturn(new Connector[] { connector });
 
-            verifyRegistration("http", 8042, 8042, "simple.acme.com");
+            verifyRegistration("http", 8042, "http", 8042, "simple.acme.com");
         }
 
         @Test
@@ -228,7 +227,7 @@ class ConsulServiceListenerTest {
             when(server.getConnectors()).thenReturn(
                 new Connector[] { localConnector1, applicationConnector, localConnector2, adminConnector, localConnector3 });
 
-            verifyRegistration("http", 9042, 9043, "server.acme.com");
+            verifyRegistration("http", 9042, "http", 9043, "server.acme.com");
         }
 
         private static LocalConnector mockLocalConnector(String name) {
@@ -244,7 +243,7 @@ class ConsulServiceListenerTest {
 
             when(server.getConnectors()).thenReturn(new Connector[] { connector1, connector2 });
 
-            verifyRegistration("http", 7142, 7142, "simple.acme.com");
+            verifyRegistration("http", 7142, "http", 7142, "simple.acme.com");
         }
 
         @Test
@@ -254,13 +253,18 @@ class ConsulServiceListenerTest {
 
             when(server.getConnectors()).thenReturn(new Connector[] { connector1, connector2 });
 
-            verifyRegistration("https", 61_532, 63_427);
+            verifyRegistration("https", 61_532, "https", 63_427);
         }
 
-        private void verifyRegistration(String scheme, int applicationPort, int adminPort, String... hosts) {
+        private void verifyRegistration(String applicationScheme,
+                                        int applicationPort,
+                                        String adminScheme,
+                                        int adminPort,
+                                        String... hosts) {
+
             listener.serverStarted(server);
 
-            verify(advertiser).register(scheme, applicationPort, adminPort, Set.of(hosts));
+            verify(advertiser).register(applicationScheme, applicationPort, adminScheme, adminPort, Set.of(hosts));
         }
     }
 
@@ -284,23 +288,23 @@ class ConsulServiceListenerTest {
             listener = new ConsulServiceListener(advertiser, (Duration) null, null);
 
             var hosts = Set.of("simple.acme.com");
-            listener.register("https", 8765, 9876, hosts);
+            listener.register("https", 8765, "https", 9876, hosts);
 
-            verify(advertiser).register("https", 8765, 9876, hosts);
+            verify(advertiser).register("https", 8765, "https", 9876, hosts);
         }
 
         @Test
         void shouldShutdownScheduler_AfterSuccessfulRegistration() {
             listener = new ConsulServiceListener(advertiser, Duration.milliseconds(10), scheduler);
 
-            when(advertiser.register(any(), anyInt(), anyInt(), anyCollection()))
+            when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection()))
                 .thenThrow(new ConsulException("boom"))
                 .thenReturn(true);
 
             var hosts = Set.of("simple.acme.com");
-            listener.register("http", 8080, 8081, hosts);
+            listener.register("http", 8080, "http", 8081, hosts);
 
-            verify(advertiser).register("http", 8080, 8081, hosts);
+            verify(advertiser).register("http", 8080, "http", 8081, hosts);
 
             await().atMost(Durations.FIVE_SECONDS)
                 .alias("scheduler should be shut down after successful registration")
@@ -310,22 +314,22 @@ class ConsulServiceListenerTest {
         @Test
         void shouldNotThrowException_WhenSchedulerNotProvided_AndRegistrationFails() {
             var ex = new ConsulException("Consul is not available at the moment, sorry");
-            when(advertiser.register(anyString(), anyInt(), anyInt(), anyCollection())).thenThrow(ex);
+            when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection())).thenThrow(ex);
 
             listener = new ConsulServiceListener(advertiser, (Duration) null, null);
 
-            assertThatCode(() -> listener.register("https", 8765, 9876, Set.of("simple.acme.com")))
+            assertThatCode(() -> listener.register("https", 8765, "https", 9876, Set.of("simple.acme.com")))
                 .doesNotThrowAnyException();
         }
 
         @Test
         void shouldNotThrowException_WhenRetryIntervalNotProvided_AndRegistrationFails() {
             var ex = new ConsulException("Consul is not available at the moment, sorry");
-            when(advertiser.register(anyString(), anyInt(), anyInt(), anyCollection())).thenThrow(ex);
+            when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection())).thenThrow(ex);
 
             listener = new ConsulServiceListener(advertiser, null, scheduler);
 
-            assertThatCode(() -> listener.register("https", 8765, 9876, Set.of("simple.acme.com")))
+            assertThatCode(() -> listener.register("https", 8765, "https", 9876, Set.of("simple.acme.com")))
                 .doesNotThrowAnyException();
 
             assertThat(scheduler.isShutdown()).isTrue();
@@ -335,11 +339,11 @@ class ConsulServiceListenerTest {
         @ValueSource(longs = { -1, 0 })
         void shouldNotThrowException_WhenRetryIntervalIsNotPositive_AndRegistrationFails(long millis) {
             var ex = new ConsulException("Consul is not available at the moment, sorry");
-            when(advertiser.register(anyString(), anyInt(), anyInt(), anyCollection())).thenThrow(ex);
+            when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection())).thenThrow(ex);
 
             listener = new ConsulServiceListener(advertiser, Duration.milliseconds(millis), scheduler);
 
-            assertThatCode(() -> listener.register("https", 8765, 9876, Set.of("simple.acme.com")))
+            assertThatCode(() -> listener.register("https", 8765, "https", 9876, Set.of("simple.acme.com")))
                 .doesNotThrowAnyException();
 
             assertThat(scheduler.isShutdown()).isTrue();
@@ -407,14 +411,14 @@ class ConsulServiceListenerTest {
 
     @Test
     void shouldRegister() {
-        when(advertiser.register(any(), anyInt(), anyInt(), anyCollection()))
+        when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection()))
             .thenThrow(new ConsulException("Cannot connect to Consul"))
             .thenReturn(true);
 
         var hosts = Set.of("192.168.1.22");
-        listener.register("http", 0, 0, hosts);
+        listener.register("http", 0, "http", 0, hosts);
 
-        verify(advertiser, timeout(100).atLeast(1)).register("http", 0, 0, hosts);
+        verify(advertiser, timeout(100).atLeast(1)).register("http", 0, "http", 0, hosts);
     }
 
     @SuppressWarnings("removal")
@@ -423,15 +427,15 @@ class ConsulServiceListenerTest {
         listener = new ConsulServiceListener(
             advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));
 
-        when(advertiser.register(any(), anyInt(), anyInt(), anyCollection()))
+        when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection()))
             .thenThrow(new ConsulException("Cannot connect to Consul"))
             .thenReturn(true);
 
         var hosts = Set.of("192.168.1.22");
-        listener.register("http", 0, 0, hosts);
+        listener.register("http", 0, "http", 0, hosts);
 
         verify(advertiser, timeout(100)
             .atLeast(1))
-            .register("http", 0, 0, hosts);
+            .register("http", 0, "http", 0, hosts);
     }
 }

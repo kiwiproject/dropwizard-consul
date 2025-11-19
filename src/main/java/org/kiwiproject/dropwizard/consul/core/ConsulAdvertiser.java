@@ -162,16 +162,36 @@ public class ConsulAdvertiser {
     }
 
     /**
-     * Register the service with Consul.
+     * Register the service with Consul, where the application and admin ports
+     * use the same scheme.
      *
-     * @param applicationScheme Scheme the server is listening on
-     * @param applicationPort   Port the service is listening on
-     * @param adminPort         Port the admin server is listening on
+     * @param scheme          Scheme the application and admin servers are listening on
+     * @param applicationPort Port the service is listening on
+     * @param adminPort       Port the admin server is listening on
      * @return true if successfully registered, otherwise false (e.g., if already registered)
      * @throws ConsulException if registration fails
      */
-    public boolean register(String applicationScheme, int applicationPort, int adminPort) {
-        return register(applicationScheme, applicationPort, adminPort, Set.of());
+    public boolean register(String scheme, int applicationPort, int adminPort) {
+        return register(scheme, applicationPort, scheme, adminPort);
+    }
+
+    /**
+     * Register the service with Consul, where the application and admin ports
+     * use the same scheme.
+     *
+     * @param scheme          Scheme the application and admin servers are listening on
+     * @param applicationPort Port the service is listening on
+     * @param adminPort       Port the admin server is listening on
+     * @param hosts           Hosts that the application is listening on (can be host name or IP address);
+     *                        may be null
+     * @return true if successfully registered, otherwise false (e.g., if already registered)
+     * @throws ConsulException if registration fails
+     */
+    public boolean register(String scheme,
+                            int applicationPort,
+                            int adminPort,
+                            @Nullable Collection<String> hosts) {
+        return register(scheme, applicationPort, scheme, adminPort, hosts);
     }
 
     /**
@@ -179,6 +199,24 @@ public class ConsulAdvertiser {
      *
      * @param applicationScheme Scheme the server is listening on
      * @param applicationPort   Port the service is listening on
+     * @param adminScheme       Scheme the admin server is listening on
+     * @param adminPort         Port the admin server is listening on
+     * @return true if successfully registered, otherwise false (e.g., if already registered)
+     * @throws ConsulException if registration fails
+     */
+    public boolean register(String applicationScheme, 
+                            int applicationPort,
+                            String adminScheme,
+                            int adminPort) {
+        return register(applicationScheme, applicationPort, adminScheme, adminPort, Set.of());
+    }
+
+    /**
+     * Register the service with Consul.
+     *
+     * @param applicationScheme Scheme the server is listening on
+     * @param applicationPort   Port the service is listening on
+     * @param adminScheme       Scheme the admin server is listening on
      * @param adminPort         Port the admin server is listening on
      * @param hosts             Hosts that the application is listening on (can be host name or IP address);
      *                          may be null
@@ -187,6 +225,7 @@ public class ConsulAdvertiser {
      */
     public boolean register(String applicationScheme,
                             int applicationPort,
+                            String adminScheme,
                             int adminPort,
                             @Nullable Collection<String> hosts) {
 
@@ -208,7 +247,7 @@ public class ConsulAdvertiser {
 
         var serviceAddressOpt = getServiceAddress(hosts);
         var serviceAddressOrNull = serviceAddressOpt.orElse(null);
-        var healthCheckUrl = getHealthCheckUrl(applicationScheme, serviceAddressOrNull);
+        var healthCheckUrl = getHealthCheckUrl(adminScheme, serviceAddressOrNull);
 
         LOG.info(
             "Registering service {} [id: {}] with address {} on port {}" +
@@ -250,6 +289,8 @@ public class ConsulAdvertiser {
         }
 
         registrationBuilder.putMeta("scheme", applicationScheme);
+        registrationBuilder.putMeta("applicationScheme", applicationScheme);
+        registrationBuilder.putMeta("adminScheme", applicationScheme);
 
         agentClient.register(registrationBuilder.build());
         return true;
@@ -374,7 +415,7 @@ public class ConsulAdvertiser {
      * @param applicationScheme scheme the server is listening on
      * @param serviceAddress    the service address, or null
      * @return health check URL
-     * @apiNote This method is called by this class in {@link #register(String, int, int, Collection)}.
+     * @apiNote This method is called by this class in {@link #register(String, int, String, int, Collection)}.
      * Overriding it in a subclass will therefore <strong>have no effect</strong> if you are using
      * {@link org.kiwiproject.dropwizard.consul.ConsulBundle ConsulBundle} for registration, since at present
      * there is no way to tell {@code ConsulBundle} to use a specific {@link ConsulAdvertiser} subclass.
