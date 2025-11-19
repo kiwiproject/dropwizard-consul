@@ -17,7 +17,7 @@ public class ConsulTestcontainers  {
     }
 
     public static DockerImageName consulDockerImageName() {
-        return DockerImageName.parse("hashicorp/consul:1.16.1");
+        return DockerImageName.parse("hashicorp/consul:1.22");
     }
 
     public static HostAndPort consulHostAndPort(ConsulContainer consul) {
