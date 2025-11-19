@@ -11,9 +11,9 @@ import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.dropwizard.util.Duration;
@@ -85,7 +85,7 @@ class ConsulServiceListenerTest {
 
             listener.serverStarted(server);
 
-            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
+            verifyNoInteractions(advertiser);
         }
 
         @Test
@@ -95,7 +95,7 @@ class ConsulServiceListenerTest {
 
             listener.serverStarted(server);
 
-            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
+            verifyNoInteractions(advertiser);
         }
 
         @Test
@@ -107,7 +107,7 @@ class ConsulServiceListenerTest {
 
             listener.serverStarted(server);
 
-            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
+            verifyNoInteractions(advertiser);
         }
 
         @Test
@@ -119,7 +119,7 @@ class ConsulServiceListenerTest {
 
             listener.serverStarted(server);
 
-            verify(advertiser, never()).register(anyString(), anyInt(), anyInt(), anyCollection());
+            verifyNoInteractions(advertiser);
         }
 
         @Test
