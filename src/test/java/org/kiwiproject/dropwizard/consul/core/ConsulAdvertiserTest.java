@@ -2,14 +2,14 @@ package org.kiwiproject.dropwizard.consul.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,11 +37,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 class ConsulAdvertiserTest {
 
+    private static final String SERVICE_ID = "test";
+    private static final String SERVICE_NAME = "test-service";
     private static final String SECOND_SUBNET_IP = "192.168.2.99";
     private static final String FIRST_SUBNET_IP = "192.168.1.53";
     private static final String THIRD_SUBNET_IP = "192.168.3.32";
@@ -51,8 +54,7 @@ class ConsulAdvertiserTest {
     private final AgentClient agent = mock(AgentClient.class);
     private final Environment environment = mock(Environment.class);
     private final MutableServletContextHandler handler = mock(MutableServletContextHandler.class);
-    @SuppressWarnings("unchecked") private final Supplier<String> supplierMock = mock(Supplier.class);
-    private final String serviceId = "test";
+    private final Supplier<String> supplierMock = mock();
     private ConsulAdvertiser advertiser;
     private ConsulFactory factory;
     private String healthCheckUrl;
@@ -64,17 +66,17 @@ class ConsulAdvertiserTest {
         when(handler.getContextPath()).thenReturn("admin");
         when(supplierMock.get()).thenReturn(null);
         factory = new ConsulFactory();
-        factory.setServiceName("test");
+        factory.setServiceName(SERVICE_NAME);
         factory.setServiceSubnet("192.168.2.0/24");
         factory.setServiceAddressSupplier(supplierMock);
         factory.setHealthCheckPath(DEFAULT_HEALTH_CHECK_PATH);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
         healthCheckUrl = "http://127.0.0.1:8081/admin/" + DEFAULT_HEALTH_CHECK_PATH;
     }
 
     @Test
     void testGetServiceId() {
-        assertThat(advertiser.getServiceId()).isEqualTo(serviceId);
+        assertThat(advertiser.getServiceId()).isEqualTo(SERVICE_ID);
     }
 
     @ParameterizedTest
@@ -82,13 +84,13 @@ class ConsulAdvertiserTest {
     void registerShouldThrowIllegalStateException_WhenServiceNameIsBlank(String serviceName) {
         factory.setServiceName(serviceName);
         assertThatIllegalStateException()
-            .isThrownBy(() -> advertiser.register("http", 8080, 8081))
+            .isThrownBy(() -> advertiser.register("http", 8080, "http", 8081))
             .withMessage("serviceName must not be blank; make sure it is set (e.g., in ConsulFactory) before calling register");
     }
 
     @Test
     void testRegister() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -99,9 +101,9 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -117,9 +119,9 @@ class ConsulAdvertiserTest {
         factory.setServiceName("test");
         factory.setServiceSubnet("192.168.2.0/24");
         factory.setServiceAddressSupplier(supplierMock);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -131,8 +133,8 @@ class ConsulAdvertiserTest {
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name("test")
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -140,9 +142,9 @@ class ConsulAdvertiserTest {
 
     @Test
     void testRegisterWithSubnet() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         advertiser.register(
-            "http", 8080, 8081, List.of(FIRST_SUBNET_IP, SECOND_SUBNET_IP, THIRD_SUBNET_IP));
+            "http", 8080, "http", 8081, List.of(FIRST_SUBNET_IP, SECOND_SUBNET_IP, THIRD_SUBNET_IP));
 
         var healthCheckUrlWithCorrectSubnet = "http://192.168.2.99:8081/admin/" + DEFAULT_HEALTH_CHECK_PATH;
         var registration = ImmutableRegistration.builder()
@@ -153,10 +155,10 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
+            .name(SERVICE_NAME)
             .address(SECOND_SUBNET_IP)
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -164,9 +166,9 @@ class ConsulAdvertiserTest {
 
     @Test
     void testRegisterWithSubnetNoEligibleIps() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         advertiser.register(
-            "http", 8080, 8081, List.of(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
+            "http", 8080, "http", 8081, List.of(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
         var registration = ImmutableRegistration.builder()
             .port(8080)
@@ -176,9 +178,9 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -186,10 +188,10 @@ class ConsulAdvertiserTest {
 
     @Test
     void testRegisterWithSupplier() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         when(supplierMock.get()).thenReturn("192.168.8.99");
         advertiser.register(
-            "http", 8080, 8081, List.of(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
+            "http", 8080, "http", 8081, List.of(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
         var healthCheckUrlWithCorrectSubnet = "http://192.168.8.99:8081/admin/healthcheck";
         var registration = ImmutableRegistration.builder()
@@ -200,10 +202,10 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "http"))
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
             .address("192.168.8.99")
-            .id(serviceId)
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -211,10 +213,10 @@ class ConsulAdvertiserTest {
 
     @Test
     void testRegisterWithSupplierException() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         when(supplierMock.get()).thenThrow(new IllegalArgumentException());
         advertiser.register(
-            "http", 8080, 8081, List.of(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
+            "http", 8080, "http", 8081, List.of(FIRST_SUBNET_IP, "192.168.7.23", THIRD_SUBNET_IP));
 
         var registration = ImmutableRegistration.builder()
             .port(8080)
@@ -224,9 +226,9 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -234,8 +236,8 @@ class ConsulAdvertiserTest {
 
     @Test
     void testRegisterWithHttps() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
-        advertiser.register("https", 8080, 8081);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
+        advertiser.register("https", 8080, "https", 8081);
 
         var httpsHealthCheckUrl = "https://127.0.0.1:8081/admin/healthcheck";
         var registration = ImmutableRegistration.builder()
@@ -246,9 +248,9 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "https"))
-            .id(serviceId)
+            .name(SERVICE_NAME)
+            .meta(standardMetaForScheme("https"))
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -260,8 +262,7 @@ class ConsulAdvertiserTest {
         var didRegister = register(advertiser);
         assertThat(didRegister).isFalse();
 
-        verify(agent, never())
-            .register(anyInt(), anyString(), anyLong(), anyString(), anyString(), anyList(), anyMap());
+        verify(agent, only()).isRegistered(SERVICE_ID);
     }
 
     @Test
@@ -270,11 +271,11 @@ class ConsulAdvertiserTest {
         factory.setServiceAddress("127.0.0.1");
 
         when(agent.isRegistered(anyString())).thenReturn(false);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
-            .id(serviceId)
+            .id(SERVICE_ID)
             .port(8888)
             .address("127.0.0.1")
             .check(
@@ -283,8 +284,8 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "http"))
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
             .build();
 
         verify(agent).register(registration);
@@ -295,8 +296,8 @@ class ConsulAdvertiserTest {
         var tags = List.of("test", "second-test");
         factory.setTags(tags);
 
-        when(agent.isRegistered(serviceId)).thenReturn(false);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -307,10 +308,10 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-            .meta(Map.of("scheme", "http"))
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
             .port(8080)
-            .id(serviceId)
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -321,22 +322,22 @@ class ConsulAdvertiserTest {
         var aclToken = "acl-token";
         factory.setAclToken(aclToken);
 
-        when(agent.isRegistered(serviceId)).thenReturn(false);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
-            .id(serviceId)
+            .id(SERVICE_ID)
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
+            .name(SERVICE_NAME)
             .port(8080)
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -347,22 +348,24 @@ class ConsulAdvertiserTest {
         var serviceMeta = Map.of("meta1-key", "meta1-value", "meta2-key", "meta2-value");
         factory.setServiceMeta(serviceMeta);
 
-        when(agent.isRegistered(serviceId)).thenReturn(false);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
             .meta(serviceMeta)
             .putMeta("scheme", "http")
+            .putMeta("applicationScheme", "http")
+            .putMeta("adminScheme", "http")
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
+            .name(SERVICE_NAME)
             .port(8080)
-                .id(serviceId)
+            .id(SERVICE_ID)
                 .build();
 
         verify(agent).register(registration);
@@ -376,11 +379,11 @@ class ConsulAdvertiserTest {
         var configuredHealthCheckUrl = "http://127.0.0.1:8081/admin/ping";
 
         when(agent.isRegistered(anyString())).thenReturn(false);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
-            .id(serviceId)
+            .id(SERVICE_ID)
             .port(8888)
             .address("127.0.0.1")
             .check(
@@ -389,11 +392,23 @@ class ConsulAdvertiserTest {
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
-            .name("test")
-                .meta(Map.of("scheme", "http"))
-                .build();
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
+            .build();
 
         verify(agent).register(registration);
+    }
+
+    private static Map<String, String> standardMetaForHttp() {
+        return standardMetaForScheme("http");
+    }
+
+    private static Map<String, String> standardMetaForScheme(String scheme) {
+        return Map.of(
+            "scheme", scheme,
+            "applicationScheme", scheme,
+            "adminScheme", scheme
+        );
     }
 
     private static void registerAndEnsureRegistered(ConsulAdvertiser advertiser) {
@@ -402,21 +417,21 @@ class ConsulAdvertiserTest {
     }
 
     private static boolean register(ConsulAdvertiser advertiser) {
-        return advertiser.register("http", 8080, 8081);
+        return advertiser.register("http", 8080, "http", 8081);
     }
 
     @Test
     void testDeregister() {
-        when(agent.isRegistered(serviceId)).thenReturn(true);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(true);
         advertiser.deregister();
-        verify(agent).deregister(serviceId);
+        verify(agent).deregister(SERVICE_ID);
     }
 
     @Test
     void testDeregisterNotRegistered() {
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         advertiser.deregister();
-        verify(agent, never()).deregister(serviceId);
+        verify(agent, only()).isRegistered(SERVICE_ID);
     }
 
     @Test
@@ -424,7 +439,7 @@ class ConsulAdvertiserTest {
         when(agent.isRegistered(anyString())).thenReturn(true);
         doThrow(new ConsulException("error")).when(agent).deregister(anyString());
         advertiser.deregister();
-        verify(agent).deregister(anyString());
+        verify(agent).deregister(SERVICE_ID);
     }
 
     // This exists to test all paths in getServiceAddress
@@ -434,7 +449,7 @@ class ConsulAdvertiserTest {
         @Test
         void shouldReturnEmptyOptional_WhenNoServiceAddress_OrSubnet_OrSupplier() {
             factory = new ConsulFactory();
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of());
 
@@ -447,7 +462,7 @@ class ConsulAdvertiserTest {
             factory.setServiceAddress("test.acme.com");
             factory.setServiceSubnet("192.168.2.0/24");
             factory.setServiceAddressSupplier(() -> "192.168.2.10");
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of());
 
@@ -458,7 +473,7 @@ class ConsulAdvertiserTest {
         void shouldReturnValueFromServiceAddressSupplier_WhenNoServiceAddress_OrSubnet() {
             factory = new ConsulFactory();
             factory.setServiceAddressSupplier(() -> "test.acme.com");
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of());
 
@@ -470,7 +485,7 @@ class ConsulAdvertiserTest {
         void shouldReturnValueFromServiceAddressSupplier_WhenHostsIsNullOrEmpty(Collection<String> hosts) {
             factory = new ConsulFactory();
             factory.setServiceAddressSupplier(() -> "test.acme.com");
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(hosts);
 
@@ -481,7 +496,7 @@ class ConsulAdvertiserTest {
         void shouldReturnValueFromServiceAddressSupplier_WhenHostsNotEmpty_ButNoSubnet() {
             factory = new ConsulFactory();
             factory.setServiceAddressSupplier(() -> "test.acme.com");
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of("192.168.2.10"));
 
@@ -499,7 +514,7 @@ class ConsulAdvertiserTest {
             factory = new ConsulFactory();
             factory.setServiceSubnet("192.168.2.0/26");
             factory.setServiceAddressSupplier(() -> "192.168.2.10");
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of(host));
 
@@ -516,7 +531,7 @@ class ConsulAdvertiserTest {
             factory = new ConsulFactory();
             factory.setServiceSubnet("192.168.2.0/26");
             factory.setServiceAddressSupplier(() -> "test.acme.com");
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of(host));
 
@@ -528,7 +543,7 @@ class ConsulAdvertiserTest {
             factory = new ConsulFactory();
             when(supplierMock.get()).thenThrow(new RuntimeException("boom"));
             factory.setServiceAddressSupplier(supplierMock);
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var serviceAddressOpt = advertiser.getServiceAddress(List.of());
 
@@ -594,12 +609,13 @@ class ConsulAdvertiserTest {
         }
     }
 
-    @Test
-    void testRegisterWithSkipTlsVerifyOnHealthCheck() {
-        factory.setHealthCheckSkipTlsVerify(true);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testRegisterWithSkipTlsVerifyOnHealthCheck(boolean tlsSkipVerify) {
+        factory.setHealthCheckSkipTlsVerify(tlsSkipVerify);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
-        when(agent.isRegistered(serviceId)).thenReturn(false);
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
         registerAndEnsureRegistered(advertiser);
 
         var registration = ImmutableRegistration.builder()
@@ -609,11 +625,11 @@ class ConsulAdvertiserTest {
                     .http(healthCheckUrl)
                     .interval("1s")
                     .deregisterCriticalServiceAfter("1m")
-                    .tlsSkipVerify(true)
+                    .tlsSkipVerify(tlsSkipVerify)
                     .build())
-             .name("test")
-            .meta(Map.of("scheme", "http"))
-            .id(serviceId)
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
             .build();
 
         verify(agent).register(registration);
@@ -643,7 +659,7 @@ class ConsulAdvertiserTest {
             factory.setAdminPort(62999);
             factory.setHealthCheckPath("health-check");
 
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var url = advertiser.getHealthCheckUrl("https", "10.116.42.84");
 
@@ -657,7 +673,7 @@ class ConsulAdvertiserTest {
             factory.setAdminPort(61424);
             factory.setHealthCheckPath("get-health");
 
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var url = advertiser.getHealthCheckUrl("https", serviceAddress);
 
@@ -671,7 +687,7 @@ class ConsulAdvertiserTest {
             factory.setHealthCheckPath("health");
             factory.setServiceAddress("10.116.42.84");
 
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var url = advertiser.getHealthCheckUrl("https", Set.of());
 
@@ -684,11 +700,52 @@ class ConsulAdvertiserTest {
             factory.setAdminPort(9999);
             factory.setHealthCheckPath("is-healthy");
 
-            advertiser = new ConsulAdvertiser(environment, factory, consul, serviceId);
+            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
 
             var url = advertiser.getHealthCheckUrl("https", Set.of());
 
             assertThat(url).isEqualTo("https://127.0.0.1:9999/admin/is-healthy");
+        }
+    }
+
+    @Nested
+    class RegisterMethodsUsingSameScheme {
+
+        @ParameterizedTest
+        @ValueSource(strings = { "http", "https" })
+        void shouldPassSchemeAsApplicationAndAdminScheme_ToRegisterMethodWithAdminScheme(String scheme) {
+            var advertiserSpy = spy(advertiser);
+            doReturn(true)
+                .when(advertiserSpy)
+                .register(anyString(), anyInt(), anyString(), anyInt());
+
+            var applicationPort = ThreadLocalRandom.current().nextInt(61000, 62000);
+            var adminPort = applicationPort + 1;
+
+            var registered = advertiserSpy.register(scheme, applicationPort, adminPort);
+
+            assertThat(registered).isTrue();
+
+            verify(advertiserSpy).register(scheme, applicationPort, scheme, adminPort);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = { "http", "https" })
+        void shouldPassSchemeAsApplicationAndAdminScheme_ToRegisterWithAdminScheme_AndHosts(String scheme) {
+            var advertiserSpy = spy(advertiser);
+            doReturn(true)
+                .when(advertiserSpy)
+                .register(anyString(), anyInt(), anyString(), anyInt(), anyCollection());
+
+            var applicationPort = ThreadLocalRandom.current().nextInt(9100, 9200);
+            var adminPort = applicationPort + 1;
+             var host = "server.example.com";
+
+            var registered = advertiserSpy.register(scheme, applicationPort, adminPort, Set.of(host));
+
+            assertThat(registered).isTrue();
+
+            verify(advertiserSpy).register(scheme, applicationPort, adminPort, Set.of(host));
         }
     }
 }
