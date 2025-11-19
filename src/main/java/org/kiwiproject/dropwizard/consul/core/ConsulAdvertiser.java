@@ -290,7 +290,7 @@ public class ConsulAdvertiser {
 
         registrationBuilder.putMeta("scheme", applicationScheme);
         registrationBuilder.putMeta("applicationScheme", applicationScheme);
-        registrationBuilder.putMeta("adminScheme", applicationScheme);
+        registrationBuilder.putMeta("adminScheme", adminScheme);
 
         agentClient.register(registrationBuilder.build());
         return true;
