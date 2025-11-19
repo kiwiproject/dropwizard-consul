@@ -399,6 +399,32 @@ class ConsulAdvertiserTest {
         verify(agent).register(registration);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testRegisterWithSkipTlsVerifyOnHealthCheck(boolean tlsSkipVerify) {
+        factory.setHealthCheckSkipTlsVerify(tlsSkipVerify);
+        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
+
+        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
+        registerAndEnsureRegistered(advertiser);
+
+        var registration = ImmutableRegistration.builder()
+            .port(8080)
+            .check(
+                ImmutableRegCheck.builder()
+                    .http(healthCheckUrl)
+                    .interval("1s")
+                    .deregisterCriticalServiceAfter("1m")
+                    .tlsSkipVerify(tlsSkipVerify)
+                    .build())
+            .name(SERVICE_NAME)
+            .meta(standardMetaForHttp())
+            .id(SERVICE_ID)
+            .build();
+
+        verify(agent).register(registration);
+    }
+
     private static Map<String, String> standardMetaForHttp() {
         return standardMetaForScheme("http");
     }
@@ -607,32 +633,6 @@ class ConsulAdvertiserTest {
                 .map(Arguments::of)
                 .limit(3);
         }
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void testRegisterWithSkipTlsVerifyOnHealthCheck(boolean tlsSkipVerify) {
-        factory.setHealthCheckSkipTlsVerify(tlsSkipVerify);
-        advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
-
-        when(agent.isRegistered(SERVICE_ID)).thenReturn(false);
-        registerAndEnsureRegistered(advertiser);
-
-        var registration = ImmutableRegistration.builder()
-            .port(8080)
-            .check(
-                ImmutableRegCheck.builder()
-                    .http(healthCheckUrl)
-                    .interval("1s")
-                    .deregisterCriticalServiceAfter("1m")
-                    .tlsSkipVerify(tlsSkipVerify)
-                    .build())
-            .name(SERVICE_NAME)
-            .meta(standardMetaForHttp())
-            .id(SERVICE_ID)
-            .build();
-
-        verify(agent).register(registration);
     }
 
     @Nested
