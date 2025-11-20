@@ -146,8 +146,12 @@ public class ConsulAdvertiser {
         configuration
             .getHealthCheckSkipTlsVerify()
             .ifPresent(newHealthCheckSkipTlsVerify -> {
-                LOG.info("Using \"{}\" as value for tls_skip_verify in registration health check",
-                    newHealthCheckSkipTlsVerify);
+                if (newHealthCheckSkipTlsVerify) {
+                    LOG.warn("Certificate validation is disabled for the health check (tls_skip_verify=true)");
+                } else {
+                    LOG.info("Certificate validation is enabled for the health check (tls_skip_verify=false)");
+                }
+
                 healthCheckSkipTlsVerify.set(newHealthCheckSkipTlsVerify);
             });
     }
@@ -204,7 +208,7 @@ public class ConsulAdvertiser {
      * @return true if successfully registered, otherwise false (e.g., if already registered)
      * @throws ConsulException if registration fails
      */
-    public boolean register(String applicationScheme, 
+    public boolean register(String applicationScheme,
                             int applicationPort,
                             String adminScheme,
                             int adminPort) {
