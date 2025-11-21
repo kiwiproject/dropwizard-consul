@@ -394,20 +394,20 @@ public class ConsulAdvertiser {
     /**
      * Return the health check URL for the service.
      *
-     * @param applicationScheme scheme the server is listening on
-     * @param hosts             the hosts to choose from
+     * @param scheme the scheme to use for the health check URL
+     * @param hosts  the hosts to choose from
      * @return health check URL
      * @deprecated use {@link #getHealthCheckUrl(String, String)} that accepts serviceAddress
      * @apiNote This method is no longer used, so overriding it will have no effect.
      */
     @SuppressWarnings({ "DeprecatedIsStillUsed", "java:S1133" })
     @Deprecated(since = "1.3.0", forRemoval = true)
-    protected String getHealthCheckUrl(String applicationScheme, Collection<String> hosts) {
+    protected String getHealthCheckUrl(String scheme, Collection<String> hosts) {
         // Deprecated: intentionally preserved original behavior for binary/source compatibility.
         // Do not modify without updating tests, release notes, etc.
         var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
             .path(healthCheckPath.get())
-            .scheme(applicationScheme)
+            .scheme(scheme)
             .host(getServiceAddress(hosts).orElse(LOCALHOST))
             .port(serviceAdminPort.get());
         return uriBuilder.build().toString();
@@ -416,8 +416,8 @@ public class ConsulAdvertiser {
     /**
      * Return the health check URL for the service.
      *
-     * @param applicationScheme scheme the server is listening on
-     * @param serviceAddress    the service address, or null
+     * @param scheme         the scheme to use for the health check URL
+     * @param serviceAddress the service address, or null
      * @return health check URL
      * @apiNote This method is called by this class in {@link #register(String, int, String, int, Collection)}.
      * Overriding it in a subclass will therefore <strong>have no effect</strong> if you are using
@@ -430,10 +430,10 @@ public class ConsulAdvertiser {
      * code to instantiate the custom {@link ConsulAdvertiser} subclass, and then add the custom
      * bundle to your {@link io.dropwizard.core.Application Application}.
      */
-    protected String getHealthCheckUrl(String applicationScheme, @Nullable String serviceAddress) {
+    protected String getHealthCheckUrl(String scheme, @Nullable String serviceAddress) {
         var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
             .path(healthCheckPath.get())
-            .scheme(applicationScheme)
+            .scheme(scheme)
             .host(isNotBlank(serviceAddress) ? serviceAddress : LOCALHOST)
             .port(serviceAdminPort.get());
         return uriBuilder.build().toString();
