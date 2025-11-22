@@ -1,10 +1,10 @@
 package org.kiwiproject.dropwizard.consul;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.isNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Preconditions;
 import com.google.common.net.HostAndPort;
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
@@ -27,22 +27,19 @@ public class ConsulFactory {
     @NotNull
     private HostAndPort endpoint =
         HostAndPort.fromParts(Consul.DEFAULT_HTTP_HOST, Consul.DEFAULT_HTTP_PORT);
-
-    @Nullable private String serviceName;
-
+    private String serviceName;
     private boolean enabled = true;
-    private Optional<String> serviceId = Optional.empty();
-    private Optional<Integer> servicePort = Optional.empty();
-    private Optional<Integer> adminPort = Optional.empty();
-    private Optional<String> serviceAddress = Optional.empty();
-    private Optional<String> serviceSubnet = Optional.empty();
-    private Optional<Supplier<String>> serviceAddressSupplier = Optional.empty();
-    private Optional<Iterable<String>> tags = Optional.empty();
-    private Optional<String> aclToken = Optional.empty();
-    private Optional<Map<String, String>> serviceMeta = Optional.empty();
+    private String serviceId;
+    private Integer servicePort;
+    private Integer adminPort;
+    private String serviceAddress;
+    private String serviceSubnet;
+    private Supplier<String> serviceAddressSupplier;
+    private Iterable<String> tags;
+    private String aclToken;
+    private Map<String, String> serviceMeta;
     private boolean servicePing = true;
 
-    @Nullable
     @MinDuration(value = 1, unit = TimeUnit.SECONDS)
     private Duration retryInterval;
 
@@ -54,15 +51,11 @@ public class ConsulFactory {
     @MinDuration(value = 1, unit = TimeUnit.MINUTES)
     private Duration deregisterInterval = Duration.minutes(1);
 
-    private Optional<String> healthCheckPath = Optional.empty();
-
+    private String healthCheckPath;
     private Boolean healthCheckSkipTlsVerify;
-
-    private Optional<Long> networkWriteTimeoutMillis = Optional.empty();
-
-    private Optional<Long> networkReadTimeoutMillis = Optional.empty();
-
-    private Optional<ClientConfig> clientConfig = Optional.empty();
+    private Long networkWriteTimeoutMillis;
+    private Long networkReadTimeoutMillis;
+    private ClientConfig clientConfig;
 
     @JsonProperty
     public boolean isEnabled() {
@@ -91,12 +84,12 @@ public class ConsulFactory {
 
     @JsonProperty
     public Optional<String> getServiceId() {
-        return serviceId;
+        return Optional.ofNullable(serviceId);
     }
 
     @JsonProperty
     public void setServiceId(@Nullable String serviceId) {
-        this.serviceId = Optional.ofNullable(serviceId);
+        this.serviceId = serviceId;
     }
 
     @Nullable
@@ -112,42 +105,42 @@ public class ConsulFactory {
 
     @JsonProperty
     public Optional<Iterable<String>> getTags() {
-        return tags;
+        return Optional.ofNullable(tags);
     }
 
     @JsonProperty
-    public void setTags(Iterable<String> tags) {
-        this.tags = Optional.ofNullable(tags);
+    public void setTags(@Nullable Iterable<String> tags) {
+        this.tags = tags;
     }
 
     @JsonProperty
     public Optional<Integer> getServicePort() {
-        return servicePort;
+        return Optional.ofNullable(servicePort);
     }
 
     @JsonProperty
-    public void setServicePort(Integer servicePort) {
-        this.servicePort = Optional.ofNullable(servicePort);
+    public void setServicePort(@Nullable Integer servicePort) {
+        this.servicePort = servicePort;
     }
 
     @JsonProperty
     public Optional<Integer> getAdminPort() {
-        return adminPort;
+        return Optional.ofNullable(adminPort);
     }
 
     @JsonProperty
-    public void setAdminPort(Integer adminPort) {
-        this.adminPort = Optional.ofNullable(adminPort);
+    public void setAdminPort(@Nullable Integer adminPort) {
+        this.adminPort = adminPort;
     }
 
     @JsonProperty
     public Optional<String> getServiceAddress() {
-        return serviceAddress;
+        return Optional.ofNullable(serviceAddress);
     }
 
     @JsonProperty
-    public void setServiceAddress(String serviceAddress) {
-        this.serviceAddress = Optional.ofNullable(serviceAddress);
+    public void setServiceAddress(@Nullable String serviceAddress) {
+        this.serviceAddress = serviceAddress;
     }
 
     @JsonProperty
@@ -182,22 +175,22 @@ public class ConsulFactory {
 
     @JsonProperty
     public Optional<String> getAclToken() {
-        return aclToken;
+        return Optional.ofNullable(aclToken);
     }
 
     @JsonProperty
     public void setAclToken(@Nullable String aclToken) {
-        this.aclToken = Optional.ofNullable(aclToken);
+        this.aclToken = aclToken;
     }
 
     @JsonProperty
     public Optional<Map<String, String>> getServiceMeta() {
-        return serviceMeta;
+        return Optional.ofNullable(serviceMeta);
     }
 
     @JsonProperty
-    public void setServiceMeta(Map<String, String> serviceMeta) {
-        this.serviceMeta = Optional.ofNullable(serviceMeta);
+    public void setServiceMeta(@Nullable Map<String, String> serviceMeta) {
+        this.serviceMeta = serviceMeta;
     }
 
     @JsonProperty
@@ -211,61 +204,61 @@ public class ConsulFactory {
     }
 
     public Optional<String> getServiceSubnet() {
-        return serviceSubnet;
+        return Optional.ofNullable(serviceSubnet);
     }
 
-    public void setServiceSubnet(String serviceSubnet) {
-        Preconditions.checkArgument(
-            isValidCidrIp(serviceSubnet), "%s is not a valid Subnet in CIDR notation", serviceSubnet);
-        this.serviceSubnet = Optional.ofNullable(serviceSubnet);
+    public void setServiceSubnet(@Nullable String serviceSubnet) {
+        checkArgument(isNull(serviceSubnet) || isValidCidrIp(serviceSubnet),
+                "%s is not a valid Subnet in CIDR notation", serviceSubnet);
+        this.serviceSubnet = serviceSubnet;
     }
 
-    public void setServiceAddressSupplier(Supplier<String> serviceAddressSupplier) {
-        this.serviceAddressSupplier = Optional.ofNullable(serviceAddressSupplier);
+    public void setServiceAddressSupplier(@Nullable Supplier<String> serviceAddressSupplier) {
+        this.serviceAddressSupplier = serviceAddressSupplier;
     }
 
     public Optional<Supplier<String>> getServiceAddressSupplier() {
-        return serviceAddressSupplier;
+        return Optional.ofNullable(serviceAddressSupplier);
     }
 
     public Optional<String> getHealthCheckPath() {
-        return healthCheckPath;
+        return Optional.ofNullable(healthCheckPath);
     }
 
-    public void setHealthCheckPath(String healthCheckPath) {
-        this.healthCheckPath = Optional.ofNullable(healthCheckPath);
+    public void setHealthCheckPath(@Nullable String healthCheckPath) {
+        this.healthCheckPath = healthCheckPath;
     }
 
     public Optional<Boolean> getHealthCheckSkipTlsVerify() {
         return Optional.ofNullable(healthCheckSkipTlsVerify);
     }
 
-    public void setHealthCheckSkipTlsVerify(Boolean tlsSkipVerify) {
+    public void setHealthCheckSkipTlsVerify(@Nullable Boolean tlsSkipVerify) {
         this.healthCheckSkipTlsVerify = tlsSkipVerify;
     }
 
     public Optional<Long> getNetworkWriteTimeoutMillis() {
-        return networkWriteTimeoutMillis;
+        return Optional.ofNullable(networkWriteTimeoutMillis);
     }
 
-    public void setNetworkWriteTimeoutMillis(Long networkTimeout) {
-        this.networkWriteTimeoutMillis = Optional.ofNullable(networkTimeout);
+    public void setNetworkWriteTimeoutMillis(@Nullable Long networkTimeout) {
+        this.networkWriteTimeoutMillis = networkTimeout;
     }
 
     public Optional<Long> getNetworkReadTimeoutMillis() {
-        return networkReadTimeoutMillis;
+        return Optional.ofNullable(networkReadTimeoutMillis);
     }
 
-    public void setNetworkReadTimeoutMillis(Long networkReadTimeoutMillis) {
-        this.networkReadTimeoutMillis = Optional.ofNullable(networkReadTimeoutMillis);
+    public void setNetworkReadTimeoutMillis(@Nullable Long networkReadTimeoutMillis) {
+        this.networkReadTimeoutMillis = networkReadTimeoutMillis;
     }
 
     public Optional<ClientConfig> getClientConfig() {
-        return clientConfig;
+        return Optional.ofNullable(clientConfig);
     }
 
-    public void setClientConfig(ClientConfig clientConfig) {
-        this.clientConfig = Optional.ofNullable(clientConfig);
+    public void setClientConfig(@Nullable ClientConfig clientConfig) {
+        this.clientConfig = clientConfig;
     }
 
     @JsonIgnore
@@ -278,12 +271,12 @@ public class ConsulFactory {
         // legacy ?token query param and another case in which endpoint
         // requires an X-Consul-Token header.
         // @see https://www.consul.io/api/index.html#acls
-        aclToken.ifPresent(token ->
+        getAclToken().ifPresent(token ->
             consulBuilder.withAclToken(token).withHeaders(Map.of(CONSUL_AUTH_HEADER_KEY, token)));
 
-        networkWriteTimeoutMillis.ifPresent(consulBuilder::withWriteTimeoutMillis);
-        networkReadTimeoutMillis.ifPresent(consulBuilder::withReadTimeoutMillis);
-        clientConfig.ifPresent(consulBuilder::withClientConfiguration);
+        getNetworkWriteTimeoutMillis().ifPresent(consulBuilder::withWriteTimeoutMillis);
+        getNetworkReadTimeoutMillis().ifPresent(consulBuilder::withReadTimeoutMillis);
+        getClientConfig().ifPresent(consulBuilder::withClientConfiguration);
 
         return consulBuilder.build();
     }
