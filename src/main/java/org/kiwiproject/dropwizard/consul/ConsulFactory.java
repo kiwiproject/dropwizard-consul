@@ -45,7 +45,7 @@ public class ConsulFactory {
 
     @NotNull
     @MinDuration(value = 1, unit = TimeUnit.SECONDS)
-    private Duration checkInterval = Duration.seconds(1);
+    private Duration checkInterval = Duration.seconds(30);
 
     @NotNull
     @MinDuration(value = 1, unit = TimeUnit.MINUTES)
