@@ -101,7 +101,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -132,7 +132,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrlWithCorrectScheme)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -163,7 +163,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name("test")
@@ -186,7 +186,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrlWithCorrectSubnet)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -209,7 +209,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -233,7 +233,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrlWithCorrectSubnet)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -257,7 +257,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -279,7 +279,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(httpsHealthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -315,7 +315,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -339,7 +339,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -365,7 +365,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -394,7 +394,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -423,7 +423,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(configuredHealthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .build())
             .name(SERVICE_NAME)
@@ -447,7 +447,7 @@ class ConsulAdvertiserTest {
             .check(
                 ImmutableRegCheck.builder()
                     .http(healthCheckUrl)
-                    .interval("1s")
+                    .interval("30s")
                     .deregisterCriticalServiceAfter("1m")
                     .tlsSkipVerify(tlsSkipVerify)
                     .build())
