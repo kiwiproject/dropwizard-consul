@@ -38,10 +38,10 @@ public class ConsulFactory {
     private Iterable<String> tags;
     private String aclToken;
     private Map<String, String> serviceMeta;
-    private boolean servicePing = true;
+    private boolean servicePing;
 
     @MinDuration(value = 1, unit = TimeUnit.SECONDS)
-    private Duration retryInterval;
+    private Duration retryInterval = Duration.seconds(1);
 
     @NotNull
     @MinDuration(value = 1, unit = TimeUnit.SECONDS)

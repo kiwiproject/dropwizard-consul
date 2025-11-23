@@ -121,6 +121,18 @@ class ConsulFactoryTest {
     }
 
     @Test
+    void shouldHaveServicePing_DefaultToFalse() {
+        var consulFactory = new ConsulFactory();
+        assertThat(consulFactory.isServicePing()).isFalse();
+    }
+
+    @Test
+    void shouldHaveDefaultRetryInterval() {
+        var consulFactory = new ConsulFactory();
+        assertThat(consulFactory.getRetryInterval()).contains(Duration.seconds(1));
+    }
+
+    @Test
     void shouldBuildConsulInstance() {
         var consulFactory = new ConsulFactory();
         consulFactory.setServicePing(false);
