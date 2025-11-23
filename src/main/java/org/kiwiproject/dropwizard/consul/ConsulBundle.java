@@ -115,7 +115,7 @@ public abstract class ConsulBundle<C extends Configuration>
                     });
 
             // using Consul as a configuration substitution provider
-            var consul = consulBuilder.build();
+            var consul = buildConsulClient(consulBuilder);
             bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
                     bootstrap.getConfigurationSourceProvider(),
@@ -131,6 +131,12 @@ public abstract class ConsulBundle<C extends Configuration>
                 consulAgentPort);
             LOG.debug("Stack trace for failure to connect to Consul at {}:{}", consulAgentHost, consulAgentPort, e);
         }
+    }
+
+    // This method exists only as a seam to allow tests to inject failures.
+    @VisibleForTesting
+    Consul buildConsulClient(Consul.Builder consulBuilder) {
+        return consulBuilder.build();
     }
 
     @Override
