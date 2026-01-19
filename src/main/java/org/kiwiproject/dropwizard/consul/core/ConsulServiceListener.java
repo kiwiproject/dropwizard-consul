@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -45,27 +44,6 @@ public class ConsulServiceListener implements ServerLifecycleListener {
     private final ConsulAdvertiser advertiser;
     private final Duration retryInterval;
     private final ScheduledExecutorService scheduler;
-
-    /**
-     * Create a new instance.
-     * <p>
-     * If the retry {@code scheduler} is provided, it will be automatically shut down
-     * after successful registration with Consul.
-     *
-     * @param advertiser    Consul advertiser
-     * @param retryInterval When specified, will retry if service registration fails
-     * @param scheduler     When specified, will retry if service registration fails
-     * @deprecated use {@link #ConsulServiceListener(ConsulAdvertiser, Duration, ScheduledExecutorService)}
-     */
-    @SuppressWarnings({ "DeprecatedIsStillUsed", "OptionalUsedAsFieldOrParameterType", "java:S1133" })
-    @Deprecated(since = "1.3.0", forRemoval = true)
-    public ConsulServiceListener(ConsulAdvertiser advertiser,
-                                 Optional<Duration> retryInterval,
-                                 Optional<ScheduledExecutorService> scheduler) {
-        this.advertiser = requireNonNull(advertiser, "advertiser == null");
-        this.retryInterval = requireNonNull(retryInterval, "retryInterval == null").orElse(null);
-        this.scheduler = requireNonNull(scheduler, "scheduler == null").orElse(null);
-    }
 
     /**
      * Create a new instance.

@@ -394,28 +394,6 @@ public class ConsulAdvertiser {
     /**
      * Return the health check URL for the service.
      *
-     * @param scheme the scheme to use for the health check URL
-     * @param hosts  the hosts to choose from
-     * @return health check URL
-     * @deprecated use {@link #getHealthCheckUrl(String, String)} that accepts serviceAddress
-     * @apiNote This method is no longer used, so overriding it will have no effect.
-     */
-    @SuppressWarnings({ "DeprecatedIsStillUsed", "java:S1133" })
-    @Deprecated(since = "1.3.0", forRemoval = true)
-    protected String getHealthCheckUrl(String scheme, Collection<String> hosts) {
-        // Deprecated: intentionally preserved original behavior for binary/source compatibility.
-        // Do not modify without updating tests, release notes, etc.
-        var uriBuilder = UriBuilder.fromPath(environment.getAdminContext().getContextPath())
-            .path(healthCheckPath.get())
-            .scheme(scheme)
-            .host(getServiceAddress(hosts).orElse(LOCALHOST))
-            .port(serviceAdminPort.get());
-        return uriBuilder.build().toString();
-    }
-
-    /**
-     * Return the health check URL for the service.
-     *
      * @param scheme         the scheme to use for the health check URL
      * @param serviceAddress the service address, or null
      * @return health check URL
