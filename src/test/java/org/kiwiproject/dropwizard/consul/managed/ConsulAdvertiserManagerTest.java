@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 @DisplayName("ConsulAdvertiserManager")
@@ -37,17 +36,6 @@ class ConsulAdvertiserManagerTest {
         verifyNoInteractions(advertiser, scheduler);
     }
 
-    @SuppressWarnings("removal")
-    @Test
-    void shouldDeregisterAdvertiserAndShutdownScheduler_WhenConstructedUsingDeprecatedConstructor() {
-        var manager = new ConsulAdvertiserManager(advertiser, Optional.of(scheduler));
-
-        manager.stop();
-
-        verify(advertiser, only()).deregister();
-        verify(scheduler, only()).shutdownNow();
-    }
-
     @Test
     void shouldDeregisterAdvertiserAndShutdownScheduler_WhenSchedulerNotNull() {
         var manager = new ConsulAdvertiserManager(advertiser, scheduler);
@@ -69,7 +57,7 @@ class ConsulAdvertiserManagerTest {
 
     @Test
     void shouldDeregisterAdvertiserAndIgnoreScheduler_WhenSchedulerIsNull() {
-        var manager = new ConsulAdvertiserManager(advertiser, (ScheduledExecutorService) null);
+        var manager = new ConsulAdvertiserManager(advertiser, null);
 
         manager.stop();
 

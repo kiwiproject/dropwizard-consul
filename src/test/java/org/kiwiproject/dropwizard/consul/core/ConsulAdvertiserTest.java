@@ -721,33 +721,6 @@ class ConsulAdvertiserTest {
 
             assertThat(url).isEqualTo("https://127.0.0.1:61424/admin/get-health");
         }
-
-        @SuppressWarnings("removal")
-        @Test
-        void shouldUseProvidedServiceAddress_WhenUsingDeprecatedMethod() {
-            factory.setAdminPort(9999);
-            factory.setHealthCheckPath("health");
-            factory.setServiceAddress("10.116.42.84");
-
-            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
-
-            var url = advertiser.getHealthCheckUrl("https", Set.of());
-
-            assertThat(url).isEqualTo("https://10.116.42.84:9999/admin/health");
-        }
-
-        @SuppressWarnings("removal")
-        @Test
-        void shouldFallBackToLoopbackAddress_WhenUsingDeprecatedMethod_AndNoServiceAddressIsProvided() {
-            factory.setAdminPort(9999);
-            factory.setHealthCheckPath("is-healthy");
-
-            advertiser = new ConsulAdvertiser(environment, factory, consul, SERVICE_ID);
-
-            var url = advertiser.getHealthCheckUrl("https", Set.of());
-
-            assertThat(url).isEqualTo("https://127.0.0.1:9999/admin/is-healthy");
-        }
     }
 
     @Nested

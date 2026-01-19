@@ -7,7 +7,6 @@ import io.dropwizard.lifecycle.Managed;
 import org.jspecify.annotations.Nullable;
 import org.kiwiproject.dropwizard.consul.core.ConsulAdvertiser;
 
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -19,26 +18,12 @@ public class ConsulAdvertiserManager implements Managed {
     private final ScheduledExecutorService scheduler;
 
     /**
-     * Create a new instance.
-     *
-     * @param advertiser   Consul advertiser
-     * @param schedulerOpt Optional retry scheduler; may not be null
-     * @deprecated use {@link #ConsulAdvertiserManager(ConsulAdvertiser, ScheduledExecutorService)}
-     */
-    @SuppressWarnings({ "OptionalUsedAsFieldOrParameterType", "java:S1133", "DeprecatedIsStillUsed" })
-    @Deprecated(since = "1.3.0", forRemoval = true)
-    public ConsulAdvertiserManager(ConsulAdvertiser advertiser, Optional<ScheduledExecutorService> schedulerOpt) {
-        this.advertiser = requireNonNull(advertiser, "advertiser == null");
-        this.scheduler = requireNonNull(schedulerOpt, "scheduler == null").orElse(null);
-    }
-
-    /**
      * Create a new instance with no scheduler. Only use this if you aren't using a retry scheduler.
      *
      * @param advertiser Consul advertiser
      */
     public ConsulAdvertiserManager(ConsulAdvertiser advertiser) {
-        this(advertiser, (ScheduledExecutorService) null);
+        this(advertiser, null);
     }
 
     /**

@@ -34,7 +34,6 @@ import org.kiwiproject.consul.ConsulException;
 import org.kiwiproject.dropwizard.consul.core.ConsulServiceListener.RetryResult;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -285,7 +284,7 @@ class ConsulServiceListenerTest {
 
         @Test
         void shouldNotUseScheduler_WhenSchedulerNotProvided_AndSuccessfullyRegisters() {
-            listener = new ConsulServiceListener(advertiser, (Duration) null, null);
+            listener = new ConsulServiceListener(advertiser, null, null);
 
             var hosts = Set.of("simple.acme.com");
             listener.register("https", 8765, "https", 9876, hosts);
@@ -316,7 +315,7 @@ class ConsulServiceListenerTest {
             var ex = new ConsulException("Consul is not available at the moment, sorry");
             when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection())).thenThrow(ex);
 
-            listener = new ConsulServiceListener(advertiser, (Duration) null, null);
+            listener = new ConsulServiceListener(advertiser, null, null);
 
             assertThatCode(() -> listener.register("https", 8765, "https", 9876, Set.of("simple.acme.com")))
                 .doesNotThrowAnyException();
@@ -419,23 +418,5 @@ class ConsulServiceListenerTest {
         listener.register("http", 0, "http", 0, hosts);
 
         verify(advertiser, timeout(100).atLeast(1)).register("http", 0, "http", 0, hosts);
-    }
-
-    @SuppressWarnings("removal")
-    @Test
-    void shouldRegister_WhenConstructedWithDeprecatedConstructor() {
-        listener = new ConsulServiceListener(
-            advertiser, Optional.of(Duration.milliseconds(1)), Optional.of(scheduler));
-
-        when(advertiser.register(anyString(), anyInt(), anyString(), anyInt(), anyCollection()))
-            .thenThrow(new ConsulException("Cannot connect to Consul"))
-            .thenReturn(true);
-
-        var hosts = Set.of("192.168.1.22");
-        listener.register("http", 0, "http", 0, hosts);
-
-        verify(advertiser, timeout(100)
-            .atLeast(1))
-            .register("http", 0, "http", 0, hosts);
     }
 }
