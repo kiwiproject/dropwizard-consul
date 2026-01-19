@@ -199,6 +199,7 @@ public class ConsulServiceListener implements ServerLifecycleListener {
      * @param adminPort         Administration port
      * @param hosts             the List of addresses the service is bound to.
      */
+    @SuppressWarnings("DataFlowIssue")
     @VisibleForTesting
     void register(String applicationScheme, int applicationPort, String adminScheme, int adminPort, Collection<String> hosts) {
         try {
