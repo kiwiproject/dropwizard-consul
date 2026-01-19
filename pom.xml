@@ -30,7 +30,7 @@
     <properties>
         <!-- Versions for required dependencies -->
         <consul-client.version>1.9.2</consul-client.version>
-        <kiwi-bom.version>2.3.1</kiwi-bom.version>
+        <kiwi-bom.version>3.0.0</kiwi-bom.version>
 
         <!-- Versions for test dependencies -->
         <kiwi.version>5.0.0</kiwi.version>
