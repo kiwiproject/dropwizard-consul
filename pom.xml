@@ -50,19 +50,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <!--
-                TODO: Remove this once on a dropwizard-logging version that uses 1.5.3 (or higher)
-
-                Prior to 1.5.3, this included its own org.jspecify.annotations.Nullable annotation
-                in its own source code, for some strange reason. Version 1.5.3 shaded it. See:
-                https://github.com/dropwizard/logback-throttling-appender/releases/tag/logback-throttling-appender-1.5.3
-            -->
-            <dependency>
-                <groupId>io.dropwizard.logback</groupId>
-                <artifactId>logback-throttling-appender</artifactId>
-                <version>1.5.3</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
