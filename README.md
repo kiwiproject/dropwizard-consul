@@ -148,6 +148,66 @@ consul:
   checkInterval: 1 second
 ```
 
+Unix Domain Socket Support
+--------------------------
+
+If your Consul agent is configured to listen on a Unix domain socket, you can
+configure the bundle to use it via `config.yml`:
+
+```yaml
+consul:
+  unixDomainSocketPath: /var/run/consul/consul.sock
+```
+
+When `unixDomainSocketPath` is set, the `endpoint` must be left at its default
+(`localhost:8500`); configuring both `unixDomainSocketPath` and a non-default
+`endpoint` at the same time is an error.
+
+### Dependency
+
+Unix domain socket support depends on `junixsocket-core`, which is an
+**optional** dependency and must be added explicitly if you want to use this
+feature.
+
+If you are using [kiwi-bom](https://github.com/kiwiproject/kiwi-bom) **3.1.0
+or later** for dependency management, the version is managed for you:
+
+```xml
+<dependency>
+    <groupId>com.kohlschutter.junixsocket</groupId>
+    <artifactId>junixsocket-core</artifactId>
+    <type>pom</type>
+</dependency>
+```
+
+Otherwise, specify the version explicitly (see
+[Maven Central](https://central.sonatype.com/artifact/com.kohlschutter.junixsocket/junixsocket-core)
+for the latest version):
+
+```xml
+<dependency>
+    <groupId>com.kohlschutter.junixsocket</groupId>
+    <artifactId>junixsocket-core</artifactId>
+    <version>[latest-version]</version>
+    <type>pom</type>
+</dependency>
+```
+
+### JVM Requirements
+
+On Java 24+, you must explicitly enable native access for junixsocket at JVM
+startup. The correct flag depends on whether your application is modularized:
+
+**Non-modularized applications** (fat JARs, most Dropwizard/Spring Boot apps):
+```
+--enable-native-access=ALL-UNNAMED
+```
+
+**Modularized applications:**
+```
+--enable-native-access=org.newsclub.net.unix
+```
+
 Migrating from smoketurner/dropwizard-consul
 --------------------------------------------
 To migrate an existing project from [smoketurner/dropwizard-consul](https://github.com/smoketurner/dropwizard-consul), you need

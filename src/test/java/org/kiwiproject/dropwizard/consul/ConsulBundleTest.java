@@ -28,6 +28,7 @@ import org.kiwiproject.net.LocalPortChecker;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 class ConsulBundleTest {
 
@@ -112,6 +113,43 @@ class ConsulBundleTest {
             verify(bundle).buildConsulClient(any());
             verifyNoInteractions(bootstrap);
         }
+
+        @Test
+        void shouldNotAllowConsulExceptionToEscape_IfConsulExceptionThrown_ViaSocketPath() {
+            var bootstrap = mock(Bootstrap.class);
+
+            doReturn(Optional.of("/tmp/consul.sock")).when(bundle).getConsulAgentUnixDomainSocketPath();
+            doThrow(new ConsulException("unexpected error")).when(bundle).buildConsulClient(any());
+
+            assertThatCode(() -> bundle.initialize(bootstrap)).doesNotThrowAnyException();
+
+            assertThat(bundle.didAttemptInitialize()).isTrue();
+            assertThat(bundle.didInitializeSucceed()).isFalse();
+
+            verify(bundle).buildConsulClient(any());
+            verifyNoInteractions(bootstrap);
+        }
+
+        @Test
+        void shouldInitializeViaSocketPath_WhenSocketPathIsPresent() {
+            var bootstrap = mock(Bootstrap.class);
+            when(bootstrap.getConfigurationSourceProvider()).thenReturn(mock(ConfigurationSourceProvider.class));
+
+            doReturn(Optional.of("/tmp/consul.sock")).when(bundle).getConsulAgentUnixDomainSocketPath();
+            assertThatCode(() -> bundle.initialize(bootstrap)).doesNotThrowAnyException();
+
+            assertThat(bundle.didAttemptInitialize()).isTrue();
+            assertThat(bundle.didInitializeSucceed()).isTrue();
+
+            verify(bootstrap).getConfigurationSourceProvider();
+            verify(bootstrap).setConfigurationSourceProvider(any());
+            verifyNoMoreInteractions(bootstrap);
+        }
+    }
+
+    @Test
+    void shouldReturnEmptyUnixDomainSocketPath_ByDefault() {
+        assertThat(bundle.getConsulAgentUnixDomainSocketPath()).isEmpty();
     }
 
     @Test

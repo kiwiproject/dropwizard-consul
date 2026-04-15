@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.net.HostAndPort;
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.net.util.SubnetUtils;
 import org.jspecify.annotations.Nullable;
@@ -56,6 +57,7 @@ public class ConsulFactory {
     private Long networkWriteTimeoutMillis;
     private Long networkReadTimeoutMillis;
     private ClientConfig clientConfig;
+    private String unixDomainSocketPath;
 
     @JsonProperty
     public boolean isEnabled() {
@@ -261,10 +263,43 @@ public class ConsulFactory {
         this.clientConfig = clientConfig;
     }
 
+    @Nullable
+    @JsonProperty
+    public String getUnixDomainSocketPath() {
+        return unixDomainSocketPath;
+    }
+
+    @JsonProperty
+    public void setUnixDomainSocketPath(@Nullable String unixDomainSocketPath) {
+        this.unixDomainSocketPath = unixDomainSocketPath;
+    }
+
+    @AssertTrue(message = "unixDomainSocketPath must not be blank when provided")
+    @JsonIgnore
+    @SuppressWarnings("unused")
+    public boolean isUnixDomainSocketPathNotBlank() {
+        return unixDomainSocketPath == null || !unixDomainSocketPath.isBlank();
+    }
+
+    @AssertTrue(message = "unixDomainSocketPath and a non-default endpoint cannot both be configured; use one or the other")
+    @JsonIgnore
+    @SuppressWarnings("unused")
+    public boolean isUnixDomainSocketPathOrEndpointValid() {
+        if (unixDomainSocketPath == null) {
+            return true;
+        }
+        var defaultEndpoint = HostAndPort.fromParts(Consul.DEFAULT_HTTP_HOST, Consul.DEFAULT_HTTP_PORT);
+        return endpoint.equals(defaultEndpoint);
+    }
+
     @JsonIgnore
     public Consul build() {
-
-        var consulBuilder = Consul.builder().withHostAndPort(endpoint).withPing(servicePing);
+        var consulBuilder = Consul.builder().withPing(servicePing);
+        if (unixDomainSocketPath != null) {
+            consulBuilder.withUnixDomainSocket(unixDomainSocketPath);
+        } else {
+            consulBuilder.withHostAndPort(endpoint);
+        }
 
         // Setting the acl token here and a header, supplying an auth
         // header. This should cover both use cases: endpoint supports
@@ -296,7 +331,8 @@ public class ConsulFactory {
             deregisterInterval,
             aclToken,
             serviceMeta,
-            servicePing);
+            servicePing,
+            unixDomainSocketPath);
     }
 
     @Override
@@ -320,7 +356,8 @@ public class ConsulFactory {
             && Objects.equals(this.deregisterInterval, other.deregisterInterval)
             && Objects.equals(this.aclToken, other.aclToken)
             && Objects.equals(this.serviceMeta, other.serviceMeta)
-            && Objects.equals(this.servicePing, other.servicePing);
+            && Objects.equals(this.servicePing, other.servicePing)
+            && Objects.equals(this.unixDomainSocketPath, other.unixDomainSocketPath);
     }
 
     private static boolean isValidCidrIp(String cidrIp) {
