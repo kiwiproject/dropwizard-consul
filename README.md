@@ -151,8 +151,8 @@ consul:
 Unix Domain Socket Support
 --------------------------
 
-If your Consul agent is configured to listen on a Unix domain socket, you can
-configure the bundle to use it via `config.yml`:
+Starting in version 2.1.0, you can configure the bundle to communicate with the local Consul agent
+via a Unix domain socket instead of TCP in your `config.yml`:
 
 ```yaml
 consul:
