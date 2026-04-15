@@ -90,15 +90,15 @@ public abstract class ConsulBundle<C extends Configuration>
         // Replace variables with values from Consul KV. Please override
         // getConsulAgentHost() and getConsulAgentPort() if Consul is not
         // listening on the default localhost:8500. Or override
-        // getConsulAgentSocketPath() to connect via a Unix domain socket.
-        var socketPath = getConsulAgentSocketPath();
+        // getConsulAgentUnixDomainSocketPath() to connect via a Unix domain socket.
+        var unixDomainSocketPath = getConsulAgentUnixDomainSocketPath();
         var consulAgentHost = getConsulAgentHost();
         var consulAgentPort = getConsulAgentPort();
         try {
             var consulBuilder = Consul.builder();
-            if (socketPath.isPresent()) {
-                LOG.debug("Connecting to Consul via Unix domain socket at {}", socketPath.get());
-                consulBuilder.withUnixDomainSocket(socketPath.get());
+            if (unixDomainSocketPath.isPresent()) {
+                LOG.debug("Connecting to Consul via Unix domain socket at {}", unixDomainSocketPath.get());
+                consulBuilder.withUnixDomainSocket(unixDomainSocketPath.get());
             } else {
                 LOG.debug("Connecting to Consul at {}:{}", consulAgentHost, consulAgentPort);
                 consulBuilder.withHostAndPort(HostAndPort.fromParts(consulAgentHost, consulAgentPort));
@@ -131,11 +131,11 @@ public abstract class ConsulBundle<C extends Configuration>
             initializeSucceeded.set(true);
         } catch (ConsulException e) {
             initializeSucceeded.set(false);
-            if (socketPath.isPresent()) {
+            if (unixDomainSocketPath.isPresent()) {
                 LOG.warn(
                     "Unable to query Consul via Unix domain socket at {}, so cannot perform configuration substitution from Consul KV (enable DEBUG to see stack trace)",
-                    socketPath.get());
-                LOG.debug("Stack trace for failure to connect to Consul via Unix domain socket at {}", socketPath.get(), e);
+                    unixDomainSocketPath.get());
+                LOG.debug("Stack trace for failure to connect to Consul via Unix domain socket at {}", unixDomainSocketPath.get(), e);
             } else {
                 LOG.warn(
                     "Unable to query Consul at {}:{}, so cannot perform configuration substitution from Consul KV (enable DEBUG to see stack trace)",
@@ -222,7 +222,7 @@ public abstract class ConsulBundle<C extends Configuration>
      *
      * @return By default, empty (no Unix domain socket)
      */
-    public Optional<String> getConsulAgentSocketPath() {
+    public Optional<String> getConsulAgentUnixDomainSocketPath() {
         return Optional.empty();
     }
 

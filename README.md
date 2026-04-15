@@ -156,12 +156,12 @@ configure the bundle to use it via `config.yml`:
 
 ```yaml
 consul:
-  socketPath: /var/run/consul/consul.sock
+  unixDomainSocketPath: /var/run/consul/consul.sock
 ```
 
-When `socketPath` is set, the `endpoint` must be left at its default
-(`localhost:8500`); configuring both `socketPath` and a non-default `endpoint`
-at the same time is an error.
+When `unixDomainSocketPath` is set, the `endpoint` must be left at its default
+(`localhost:8500`); configuring both `unixDomainSocketPath` and a non-default
+`endpoint` at the same time is an error.
 
 ### Dependency
 

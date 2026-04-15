@@ -118,7 +118,7 @@ class ConsulBundleTest {
         void shouldNotAllowConsulExceptionToEscape_IfConsulExceptionThrown_ViaSocketPath() {
             var bootstrap = mock(Bootstrap.class);
 
-            doReturn(Optional.of("/tmp/consul.sock")).when(bundle).getConsulAgentSocketPath();
+            doReturn(Optional.of("/tmp/consul.sock")).when(bundle).getConsulAgentUnixDomainSocketPath();
             doThrow(new ConsulException("unexpected error")).when(bundle).buildConsulClient(any());
 
             assertThatCode(() -> bundle.initialize(bootstrap)).doesNotThrowAnyException();
@@ -135,7 +135,7 @@ class ConsulBundleTest {
             var bootstrap = mock(Bootstrap.class);
             when(bootstrap.getConfigurationSourceProvider()).thenReturn(mock(ConfigurationSourceProvider.class));
 
-            doReturn(Optional.of("/tmp/consul.sock")).when(bundle).getConsulAgentSocketPath();
+            doReturn(Optional.of("/tmp/consul.sock")).when(bundle).getConsulAgentUnixDomainSocketPath();
             assertThatCode(() -> bundle.initialize(bootstrap)).doesNotThrowAnyException();
 
             assertThat(bundle.didAttemptInitialize()).isTrue();
@@ -148,8 +148,8 @@ class ConsulBundleTest {
     }
 
     @Test
-    void shouldReturnEmptySocketPath_ByDefault() {
-        assertThat(bundle.getConsulAgentSocketPath()).isEmpty();
+    void shouldReturnEmptyUnixDomainSocketPath_ByDefault() {
+        assertThat(bundle.getConsulAgentUnixDomainSocketPath()).isEmpty();
     }
 
     @Test

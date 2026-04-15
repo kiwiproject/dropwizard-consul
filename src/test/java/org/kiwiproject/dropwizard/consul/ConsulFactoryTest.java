@@ -2,9 +2,9 @@ package org.kiwiproject.dropwizard.consul;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.google.common.net.HostAndPort;
 import io.dropwizard.util.Duration;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.kiwiproject.consul.Consul;
 
 import java.util.List;
 
@@ -134,61 +135,62 @@ class ConsulFactoryTest {
     }
 
     @Test
-    void shouldBuildConsulInstance() {
+    void shouldHaveNullUnixDomainSocketPathByDefault() {
         var consulFactory = new ConsulFactory();
-        consulFactory.setServicePing(false);
-
-        var consul = consulFactory.build();
-        assertThat(consul).isNotNull();
+        assertThat(consulFactory.getUnixDomainSocketPath()).isNull();
     }
 
     @Test
-    void shouldHaveNullSocketPathByDefault() {
+    void shouldSetUnixDomainSocketPath() {
         var consulFactory = new ConsulFactory();
-        assertThat(consulFactory.getSocketPath()).isNull();
+        consulFactory.setUnixDomainSocketPath("/tmp/consul.sock");
+        assertThat(consulFactory.getUnixDomainSocketPath()).isEqualTo("/tmp/consul.sock");
+    }
+
+    @Nested
+    class ConnectionMode {
+
+        @Test
+        void shouldUseHostAndPort_WhenUnixDomainSocketPathIsNotSet() {
+            var factory = new ConsulFactory();
+            factory.setServicePing(false);
+
+            // No socket path configured: host/port mode is active, UDS is not
+            assertThat(factory.getUnixDomainSocketPath()).isNull();
+            assertThat(factory.getEndpoint())
+                .isEqualTo(HostAndPort.fromParts(Consul.DEFAULT_HTTP_HOST, Consul.DEFAULT_HTTP_PORT));
+
+            assertThat(factory.build()).isNotNull();
+        }
+
+        @Test
+        void shouldUseUnixDomainSocket_WhenUnixDomainSocketPathIsSet() {
+            var factory = new ConsulFactory();
+            factory.setServicePing(false);
+            factory.setUnixDomainSocketPath("/tmp/consul.sock");
+
+            // Socket path is set and endpoint is at its default: UDS mode is active, TCP is not
+            assertThat(factory.getUnixDomainSocketPath()).isEqualTo("/tmp/consul.sock");
+            assertThat(factory.getEndpoint())
+                .isEqualTo(HostAndPort.fromParts(Consul.DEFAULT_HTTP_HOST, Consul.DEFAULT_HTTP_PORT));
+
+            assertThat(factory.build()).isNotNull();
+        }
     }
 
     @Test
-    void shouldSetSocketPath() {
-        var consulFactory = new ConsulFactory();
-        consulFactory.setSocketPath("/tmp/consul.sock");
-        assertThat(consulFactory.getSocketPath()).isEqualTo("/tmp/consul.sock");
-    }
-
-    @Test
-    void shouldBuildConsulInstanceViaSocketPath() {
-        var consulFactory = new ConsulFactory();
-        consulFactory.setServicePing(false);
-        consulFactory.setSocketPath("/tmp/consul.sock");
-
-        var consul = consulFactory.build();
-        assertThat(consul).isNotNull();
-    }
-
-    @Test
-    void shouldThrowIllegalStateException_WhenBothSocketPathAndNonDefaultEndpointConfigured() {
-        var consulFactory = new ConsulFactory();
-        consulFactory.setSocketPath("/tmp/consul.sock");
-        consulFactory.setEndpoint(com.google.common.net.HostAndPort.fromParts("consul.example.com", 8500));
-
-        assertThatIllegalStateException().isThrownBy(consulFactory::build)
-            .withMessageContaining("socketPath")
-            .withMessageContaining("endpoint");
-    }
-
-    @Test
-    void socketPath_ShouldAffectEquality() {
+    void unixDomainSocketPath_ShouldAffectEquality() {
         var factory1 = createFullyPopulatedConsulFactory();
         var factory2 = createFullyPopulatedConsulFactory();
-        factory2.setSocketPath("/tmp/consul.sock");
+        factory2.setUnixDomainSocketPath("/tmp/consul.sock");
         assertThat(factory1).isNotEqualTo(factory2);
     }
 
     @Test
-    void socketPath_ShouldAffectHashCode() {
+    void unixDomainSocketPath_ShouldAffectHashCode() {
         var factory1 = createFullyPopulatedConsulFactory();
         var factory2 = createFullyPopulatedConsulFactory();
-        factory2.setSocketPath("/tmp/consul.sock");
+        factory2.setUnixDomainSocketPath("/tmp/consul.sock");
         assertThat(factory1.hashCode()).isNotEqualTo(factory2.hashCode());
     }
 
@@ -260,6 +262,35 @@ class ConsulFactoryTest {
 
             var violations = VALIDATOR.validateProperty(factory, "deregisterInterval");
             assertThat(violations).hasSize(1);
+        }
+
+        @Test
+        void shouldPassValidation_WhenSocketPathIsNotConfigured() {
+            // unixDomainSocketPath is null by default; any endpoint is valid
+            factory.setEndpoint(HostAndPort.fromParts("consul.example.com", 8500));
+
+            var violations = VALIDATOR.validate(factory);
+            assertThat(violations).isEmpty();
+        }
+
+        @Test
+        void shouldAllowSocketPath_WhenEndpointIsDefault() {
+            factory.setUnixDomainSocketPath("/tmp/consul.sock");
+
+            var violations = VALIDATOR.validate(factory);
+            assertThat(violations).isEmpty();
+        }
+
+        @Test
+        void shouldRejectSocketPath_WhenNonDefaultEndpointIsAlsoConfigured() {
+            factory.setUnixDomainSocketPath("/tmp/consul.sock");
+            factory.setEndpoint(HostAndPort.fromParts("consul.example.com", 8500));
+
+            var violations = VALIDATOR.validate(factory);
+            assertThat(violations).hasSize(1);
+            assertThat(violations.iterator().next().getMessage())
+                .contains("unixDomainSocketPath")
+                .contains("endpoint");
         }
     }
 
