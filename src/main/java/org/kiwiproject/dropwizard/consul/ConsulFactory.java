@@ -274,6 +274,13 @@ public class ConsulFactory {
         this.unixDomainSocketPath = unixDomainSocketPath;
     }
 
+    @AssertTrue(message = "unixDomainSocketPath must not be blank when provided")
+    @JsonIgnore
+    @SuppressWarnings("unused")
+    public boolean isUnixDomainSocketPathNotBlank() {
+        return unixDomainSocketPath == null || !unixDomainSocketPath.isBlank();
+    }
+
     @AssertTrue(message = "unixDomainSocketPath and a non-default endpoint cannot both be configured; use one or the other")
     @JsonIgnore
     @SuppressWarnings("unused")

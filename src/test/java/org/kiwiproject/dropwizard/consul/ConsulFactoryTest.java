@@ -265,6 +265,26 @@ class ConsulFactoryTest {
         }
 
         @Test
+        void shouldPassValidation_WhenUnixDomainSocketPathIsNull() {
+            assertThat(factory.getUnixDomainSocketPath()).isNull();
+
+            var violations = VALIDATOR.validate(factory);
+            assertThat(violations).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"", " ", "\t"})
+        void shouldRejectBlankUnixDomainSocketPath(String blank) {
+            factory.setUnixDomainSocketPath(blank);
+
+            var violations = VALIDATOR.validate(factory);
+            assertThat(violations).hasSize(1);
+            assertThat(violations.iterator().next().getMessage())
+                .contains("unixDomainSocketPath")
+                .contains("blank");
+        }
+
+        @Test
         void shouldPassValidation_WhenSocketPathIsNotConfigured() {
             // unixDomainSocketPath is null by default; any endpoint is valid
             factory.setEndpoint(HostAndPort.fromParts("consul.example.com", 8500));
