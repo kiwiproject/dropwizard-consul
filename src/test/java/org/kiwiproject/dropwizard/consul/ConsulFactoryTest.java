@@ -2,6 +2,7 @@ package org.kiwiproject.dropwizard.consul;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import io.dropwizard.util.Duration;
@@ -139,6 +140,56 @@ class ConsulFactoryTest {
 
         var consul = consulFactory.build();
         assertThat(consul).isNotNull();
+    }
+
+    @Test
+    void shouldHaveNullSocketPathByDefault() {
+        var consulFactory = new ConsulFactory();
+        assertThat(consulFactory.getSocketPath()).isNull();
+    }
+
+    @Test
+    void shouldSetSocketPath() {
+        var consulFactory = new ConsulFactory();
+        consulFactory.setSocketPath("/tmp/consul.sock");
+        assertThat(consulFactory.getSocketPath()).isEqualTo("/tmp/consul.sock");
+    }
+
+    @Test
+    void shouldBuildConsulInstanceViaSocketPath() {
+        var consulFactory = new ConsulFactory();
+        consulFactory.setServicePing(false);
+        consulFactory.setSocketPath("/tmp/consul.sock");
+
+        var consul = consulFactory.build();
+        assertThat(consul).isNotNull();
+    }
+
+    @Test
+    void shouldThrowIllegalStateException_WhenBothSocketPathAndNonDefaultEndpointConfigured() {
+        var consulFactory = new ConsulFactory();
+        consulFactory.setSocketPath("/tmp/consul.sock");
+        consulFactory.setEndpoint(com.google.common.net.HostAndPort.fromParts("consul.example.com", 8500));
+
+        assertThatIllegalStateException().isThrownBy(consulFactory::build)
+            .withMessageContaining("socketPath")
+            .withMessageContaining("endpoint");
+    }
+
+    @Test
+    void socketPath_ShouldAffectEquality() {
+        var factory1 = createFullyPopulatedConsulFactory();
+        var factory2 = createFullyPopulatedConsulFactory();
+        factory2.setSocketPath("/tmp/consul.sock");
+        assertThat(factory1).isNotEqualTo(factory2);
+    }
+
+    @Test
+    void socketPath_ShouldAffectHashCode() {
+        var factory1 = createFullyPopulatedConsulFactory();
+        var factory2 = createFullyPopulatedConsulFactory();
+        factory2.setSocketPath("/tmp/consul.sock");
+        assertThat(factory1.hashCode()).isNotEqualTo(factory2.hashCode());
     }
 
     @Nested

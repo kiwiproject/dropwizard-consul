@@ -56,6 +56,7 @@ public class ConsulFactory {
     private Long networkWriteTimeoutMillis;
     private Long networkReadTimeoutMillis;
     private ClientConfig clientConfig;
+    private String socketPath;
 
     @JsonProperty
     public boolean isEnabled() {
@@ -261,10 +262,31 @@ public class ConsulFactory {
         this.clientConfig = clientConfig;
     }
 
+    @Nullable
+    @JsonProperty
+    public String getSocketPath() {
+        return socketPath;
+    }
+
+    @JsonProperty
+    public void setSocketPath(@Nullable String socketPath) {
+        this.socketPath = socketPath;
+    }
+
     @JsonIgnore
     public Consul build() {
+        var defaultEndpoint = HostAndPort.fromParts(Consul.DEFAULT_HTTP_HOST, Consul.DEFAULT_HTTP_PORT);
+        if (socketPath != null && !endpoint.equals(defaultEndpoint)) {
+            throw new IllegalStateException(
+                "Cannot configure both socketPath and a non-default endpoint; use one or the other");
+        }
 
-        var consulBuilder = Consul.builder().withHostAndPort(endpoint).withPing(servicePing);
+        var consulBuilder = Consul.builder().withPing(servicePing);
+        if (socketPath != null) {
+            consulBuilder.withUnixDomainSocket(socketPath);
+        } else {
+            consulBuilder.withHostAndPort(endpoint);
+        }
 
         // Setting the acl token here and a header, supplying an auth
         // header. This should cover both use cases: endpoint supports
@@ -296,7 +318,8 @@ public class ConsulFactory {
             deregisterInterval,
             aclToken,
             serviceMeta,
-            servicePing);
+            servicePing,
+            socketPath);
     }
 
     @Override
@@ -320,7 +343,8 @@ public class ConsulFactory {
             && Objects.equals(this.deregisterInterval, other.deregisterInterval)
             && Objects.equals(this.aclToken, other.aclToken)
             && Objects.equals(this.serviceMeta, other.serviceMeta)
-            && Objects.equals(this.servicePing, other.servicePing);
+            && Objects.equals(this.servicePing, other.servicePing)
+            && Objects.equals(this.socketPath, other.socketPath);
     }
 
     private static boolean isValidCidrIp(String cidrIp) {
