@@ -33,7 +33,7 @@
         <kiwi-bom.version>3.3.5</kiwi-bom.version>
 
         <!-- Versions for test dependencies -->
-        <kiwi.version>5.4.0</kiwi.version>
+        <kiwi.version>5.4.1</kiwi.version>
 
         <!-- Sonar properties -->
         <sonar.projectKey>kiwiproject_dropwizard-consul</sonar.projectKey>
